@@ -128,20 +128,18 @@ const ScrambleForm = ({ eventId, onSuccess }: ScrambleProps) => {
   };
 
   const searchClub = async () => {
-    let clubSearch: ClubSearch = {
+    const clubSearch: ClubSearch = {
       city: city,
       clubName: clubName,
       state: state,
     };
     const response = await SearchClubs(clubSearch);
-    console.log("ClubSearch", response);
     if (response.status == 200) {
       setClubList(response.data);
     }
   };
 
   const selectClub = async (club: Club) => {
-    console.log("Selected", club);
     setSelectedClub(club);
     setCourseList(club.courses);
     setShowCourseGrid(true);

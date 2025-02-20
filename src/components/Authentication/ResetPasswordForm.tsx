@@ -27,7 +27,7 @@ const ResetPasswordForm = ({ golferId }: { golferId: string | null }) => {
               }}
               onSubmit={async (values) => {
                 if (golferId) {
-                  var golferResponse = await GetGolferByToken(
+                  const golferResponse = await GetGolferByToken(
                     golferId.toString()
                   );
                   if (golferResponse.status == 200) {

@@ -68,8 +68,8 @@ const InfoPage = () => {
             Communication is key in any event, and Gimme Putt Golf ensures that
             you&apos;re always connected. The app provides built-in messaging
             features that allow you to send updates, changes, and announcements
-            directly to participants' phones. Whether it&apos;s a change in tee
-            time or a weather update, your message gets through instantly,
+            directly to participants&apos; phones. Whether it&apos;s a change in
+            tee time or a weather update, your message gets through instantly,
             keeping everyone informed and engaged.
           </div>
           <div
@@ -98,7 +98,7 @@ const InfoPage = () => {
             through this app straightforward and hassle-free.
           </div>
           <div>
-            Gimme Putt Golf is more than just an app—it's your partner in
+            Gimme Putt Golf is more than just an app—it&apos;s your partner in
             organizing memorable golf scrambles. It&apos;s time to elevate your
             golf events with efficiency and flair, making every scramble a hit.
             Try Gimme Putt Golf today and discover how easy and enjoyable

@@ -24,7 +24,7 @@ const RegisterForm: React.FC = () => {
     }
   }, []);
 
-  const [showConfirmation, setShowConfirmaton] = useState<Boolean>(false);
+  const [showConfirmation, setShowConfirmaton] = useState<boolean>(false);
 
   const SignupSchema = Yup.object().shape({
     firstName: Yup.string().required("Required"),
