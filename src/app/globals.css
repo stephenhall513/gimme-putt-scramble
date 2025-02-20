@@ -1,16 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Russo+One&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 :root {
+  scroll-behavior: smooth;
+  --bodyTextColor: #e6e6e6;
+  --bodyTextSize: 16px;
+  --primaryColor: #7db534;
+  --secondaryColor: #3e7825;
+  --thirdColor: #9ed44e;
+  --blueColor: #214168;
+  --redColor: #f2002e;
+  --flagColor: #df564a;
   --background: #ffffff;
   --foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    --foreground: #000000;
   }
 }
 

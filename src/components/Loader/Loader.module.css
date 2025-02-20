@@ -1,0 +1,26 @@
+.loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Ensure it takes at least the full viewport height */
+    width: 100vw; /* Ensure it takes at least the full viewport width */
+    position: fixed; /* Fixed position to stay in view */
+    top: 0;
+    left: 0;
+}
+
+.loader :global(img) {
+    
+    animation:zoomInOut 3s ease-in-out infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes zoomInOut {
+    0%, 100% { transform: scale(.75); }
+    50% { transform: scale(1.5); }
+}
+
