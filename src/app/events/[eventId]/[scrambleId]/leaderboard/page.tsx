@@ -5,7 +5,7 @@ export default async function LeaderboardPage({
 }: {
   params: { scrambleId: string };
 }) {
-  const { scrambleId } = params; // No need to await
+  const scrambleId = (await params).scrambleId;
 
   return (
     <>
