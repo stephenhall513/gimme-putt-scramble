@@ -1,5 +1,4 @@
-import Leaderboard from "@/components/Leaderboard/page";
-import { Grid2 } from "@mui/material";
+import Leaderboard from "@/components/Leaderboard/Leaderboard";
 
 const LeaderboardPage = async ({
   params,

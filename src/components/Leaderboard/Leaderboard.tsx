@@ -1,3 +1,4 @@
+"use client";
 import { fetcher } from "@/api/fetcher";
 import LeaderboardPage from "@/app/events/[eventId]/leaderboard/page";
 import { ScrambleTeam } from "@/types/Team";

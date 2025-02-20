@@ -1,6 +1,6 @@
 import ScrambleEventEditForm from "@/components/Forms/ScrambleEventEditForm/ScrambleEventEditForm";
 import ScrambleList from "@/components/ScrambleList/ScrambleList";
-import { Button, Container } from "@mui/material";
+import { Container } from "@mui/material";
 
 export default async function ScrambleEventPage({
   params,

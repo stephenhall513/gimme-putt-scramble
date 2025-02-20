@@ -61,7 +61,7 @@ export const CreateScrambleTeam = async (data: ScrambleTeamCreate) => {
 
 export const DeleteScrambleTeam = async (id: string) => {
   const response = await axios.post<string>(
-    process.env.NEXT_PUBLIC_API_URL + "/Scramble/CreateScrambleTeam"
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/CreateScrambleTeam" + id
   );
   return response;
 };

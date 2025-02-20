@@ -1,7 +1,6 @@
 "use client";
 import ScrambleCode from "@/components/Forms/ScrambleCode/ScrambleCode";
 import { Container } from "@mui/material";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 

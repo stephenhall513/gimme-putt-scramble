@@ -1,4 +1,4 @@
-import { Button, Container } from "@mui/material";
+import { Container } from "@mui/material";
 
 export default async function ScrambleDetailPage({
   params,

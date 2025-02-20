@@ -1,4 +1,3 @@
-import HoleMap from "@/components/HoleMap";
 import ScoreEntry from "@/components/ScoreEntry/ScoreEntry";
 import { Container } from "@mui/material";
 
@@ -7,7 +6,7 @@ export default async function ScoringPage({
 }: {
   params: { scrambleTeamId: string };
 }) {
-  const scrambleId = (await params).scrambleTeamId;
+  //const scrambleId = (await params).scrambleTeamId;
 
   return (
     <>

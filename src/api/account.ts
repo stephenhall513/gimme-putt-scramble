@@ -10,7 +10,7 @@ export const RegisterAccount = async (registration: Registration) => {
 };
 
 export const LoginApi = async (credentials: Credentials) => {
-  const response = await axios.post<any>(
+  const response = await axios.post(
     process.env.NEXT_PUBLIC_API_URL + "/Account/Login",
     credentials
   );

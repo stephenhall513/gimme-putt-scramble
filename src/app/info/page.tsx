@@ -1,5 +1,4 @@
 import { Button, Container } from "@mui/material";
-import Image from "next/image";
 import Link from "next/link";
 
 const InfoPage = () => {
@@ -67,11 +66,11 @@ const InfoPage = () => {
           </div>
           <div>
             Communication is key in any event, and Gimme Putt Golf ensures that
-            you’re always connected. The app provides built-in messaging
+            you&apos;re always connected. The app provides built-in messaging
             features that allow you to send updates, changes, and announcements
-            directly to participants' phones. Whether it’s a change in tee time
-            or a weather update, your message gets through instantly, keeping
-            everyone informed and engaged.
+            directly to participants' phones. Whether it&apos;s a change in tee
+            time or a weather update, your message gets through instantly,
+            keeping everyone informed and engaged.
           </div>
           <div
             className="text-lg pb-4 pt-4"
@@ -94,16 +93,16 @@ const InfoPage = () => {
           </div>
           <div className="pb-4">
             Designed with golfers in mind, Gimme Putt Golf boasts an intuitive
-            layout that makes navigation a breeze. Whether you’re tech-savvy or
-            not, you’ll find managing your golf scramble through this app
-            straightforward and hassle-free.
+            layout that makes navigation a breeze. Whether you&apos;re
+            tech-savvy or not, you&apos;ll find managing your golf scramble
+            through this app straightforward and hassle-free.
           </div>
           <div>
             Gimme Putt Golf is more than just an app—it's your partner in
-            organizing memorable golf scrambles. It’s time to elevate your golf
-            events with efficiency and flair, making every scramble a hit. Try
-            Gimme Putt Golf today and discover how easy and enjoyable hosting a
-            golf scramble can be!
+            organizing memorable golf scrambles. It&apos;s time to elevate your
+            golf events with efficiency and flair, making every scramble a hit.
+            Try Gimme Putt Golf today and discover how easy and enjoyable
+            hosting a golf scramble can be!
           </div>
           <div className="text-center pt-6">
             <Link href="/signup">

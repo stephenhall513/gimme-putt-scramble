@@ -17,14 +17,14 @@ export const UpdateScrambleEvent = async (data: ScrambleEvent) => {
   return response;
 };
 
-export const GetScrambleEvent = async (id: String) => {
+export const GetScrambleEvent = async (id: string) => {
   const response = await axios.get<ScrambleEvent>(
     process.env.NEXT_PUBLIC_API_URL + "/Event/ScrambleEvent/" + id
   );
   return response;
 };
 
-export const GetScrambleEvents = async (golferId: String) => {
+export const GetScrambleEvents = async (golferId: string) => {
   const response = await axios.get<ScrambleEvent[]>(
     process.env.NEXT_PUBLIC_API_URL + "/Event/ScrambleEvents/" + golferId
   );

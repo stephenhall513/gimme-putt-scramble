@@ -1,5 +1,5 @@
 import { ScrambleTeam } from "@/types/Team";
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 
 export const GetLeaderboard = async (scrambleId: string) => {
   const response = await axios.get<ScrambleTeam[]>(

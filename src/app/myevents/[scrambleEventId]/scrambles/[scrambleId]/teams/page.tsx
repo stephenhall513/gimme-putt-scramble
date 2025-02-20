@@ -1,5 +1,3 @@
-import ScrambleTeamForm from "@/components/Forms/ScrambleTeamForm/ScrambleTeamForm";
-import ScrambleOverview from "@/components/ScrambleOverview/ScrambleOverview";
 import ScrambleTeamsList from "@/components/ScrambleTeamsList/ScrambleTeamsList";
 import { Container } from "@mui/material";
 

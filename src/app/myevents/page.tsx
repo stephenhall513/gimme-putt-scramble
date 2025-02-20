@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { getCookie } from "cookies-next";
 import { ScrambleEvent } from "@/types/ScrambleEvent";
 import Loader from "@/components/Loader";
-import Image from "next/image";
 import { Container } from "@mui/material";
 import { useRouter } from "next/navigation";
 
@@ -18,7 +17,7 @@ const MyEventsPage = () => {
     const getEvents = async () => {
       const golferId = await getCookie("golferId");
       if (golferId) {
-        var response = await GetScrambleEvents(golferId);
+        const response = await GetScrambleEvents(golferId);
         if (response.status == 200) {
           setScrambleEvents(response.data);
         }
@@ -29,14 +28,13 @@ const MyEventsPage = () => {
   }, []);
 
   const gotoDetails = async (scrambleEventId: string) => {
-    console.log("Navigating to event:", scrambleEventId); // Debug log
     router.push("/myevents/" + scrambleEventId);
   };
 
-  const gotoTeams = async (scrambleEventId: string) => {
-    console.log("Navigating to event:", scrambleEventId); // Debug log
-    router.push("/myevents/" + scrambleEventId + "/teams");
-  };
+  // const gotoTeams = async (scrambleEventId: string) => {
+  //   console.log("Navigating to event:", scrambleEventId); // Debug log
+  //   router.push("/myevents/" + scrambleEventId + "/teams");
+  // };
 
   return (
     <>

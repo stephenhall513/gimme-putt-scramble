@@ -9,7 +9,7 @@ export const AddScores = async (data: ScrambleScore) => {
   return response;
 };
 
-export const GetScore = async (id: String) => {
+export const GetScore = async (id: string) => {
   const response = await axios.get<ScrambleScore>(
     process.env.NEXT_PUBLIC_API_URL + "/Scramble/GetScore/" + id
   );
