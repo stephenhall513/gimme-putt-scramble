@@ -1,3 +1,4 @@
+"use client";
 import { ScrambleEvent } from "@/types/ScrambleEvent";
 import Link from "next/link";
 import { useEffect, useState } from "react";
