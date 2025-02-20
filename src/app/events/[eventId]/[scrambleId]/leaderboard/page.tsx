@@ -1,10 +1,10 @@
 import Leaderboard from "@/components/Leaderboard/Leaderboard";
 
-const LeaderboardPage = async ({
+export default async function LeaderboardPage({
   params,
 }: {
-  params: { scrambleId: string };
-}) => {
+  params: Promise<{ scrambleId: string }>;
+}) {
   const scrambleId = (await params).scrambleId;
 
   return (
@@ -14,6 +14,4 @@ const LeaderboardPage = async ({
       </div>
     </>
   );
-};
-
-export default LeaderboardPage;
+}
