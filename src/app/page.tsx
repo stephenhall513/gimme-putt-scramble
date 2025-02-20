@@ -1,16 +1,13 @@
 "use client";
 import ScrambleCode from "@/components/Forms/ScrambleCode/ScrambleCode";
+import ScrambleEntry from "@/components/Forms/ScrambleEntry/ScrambleEntry";
+import ScrambleTeamsSelect from "@/components/ScrambleTeamsSelect/ScrambleTeamsSelect";
+import { ScrambleTeam } from "@/types/Team";
 import { Container } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const router = useRouter();
-
-  const onSuccess = (scrambleId: string) => {
-    router.push("/scramble/" + scrambleId);
-  };
-
   return (
     <div>
       <div
@@ -20,7 +17,7 @@ export default function Home() {
         Welcome to Gimme Putt Scramble!
       </div>
       <Container className="bg-[#F8F6F5] rounded-md p-4">
-        <ScrambleCode onSuccess={(value: string) => onSuccess(value)} />
+        <ScrambleEntry />
         <div className="text-center text-black pb-4 text-sm">
           <Link href="/info" title="Interested in Setting Up a Scramble?">
             Interested in Setting Up a Scramble?{" "}

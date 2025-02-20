@@ -31,9 +31,25 @@ export const CheckScrambleCode = async (id: string) => {
   return response;
 };
 
+export const CheckScrambleEmail = async (email: string) => {
+  const response = await axios.get<ScrambleTeam[]>(
+    process.env.NEXT_PUBLIC_API_URL +
+      "/Scramble/CheckScrambleEmail?email=" +
+      email
+  );
+  return response;
+};
+
 export const GetScrambleTeams = async (id: string) => {
   const response = await axios.get<ScrambleTeam[]>(
     process.env.NEXT_PUBLIC_API_URL + "/Scramble/ScrambleTeams/" + id
+  );
+  return response;
+};
+
+export const GetScrambleTeam = async (id: string) => {
+  const response = await axios.get<ScrambleTeam>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/ScrambleTeam/" + id
   );
   return response;
 };

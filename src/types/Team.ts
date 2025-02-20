@@ -12,7 +12,7 @@ export type ScrambleTeam = {
   par: number;
   status: string;
   holesPlayed: number;
-  Scramble: Scramble;
+  scramble: Scramble;
 };
 
 export type ScrambleTeamCreate = {

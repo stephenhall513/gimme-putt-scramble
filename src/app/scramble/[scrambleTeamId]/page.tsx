@@ -5,9 +5,9 @@ import { Container } from "@mui/material";
 export default async function ScramblePage({
   params,
 }: {
-  params: Promise<{ scrambleId: string }>;
+  params: Promise<{ scrambleTeamId: string }>;
 }) {
-  const scrambleId = (await params).scrambleId;
+  const scrambleTeamId = (await params).scrambleTeamId;
 
   {
     /* Course Name */
@@ -37,9 +37,7 @@ export default async function ScramblePage({
           <div className="container mx-auto">
             <div className="p-2">
               <Container className="bg-[#F8F6F5] rounded-md p-4">
-                <ScrambleOverview scrambleId={scrambleId} />
-                <div className="text-center">Please Click On Your Team</div>
-                <ScrambleTeamsSelect scrambleId={scrambleId} />
+                <ScrambleOverview scrambleTeamId={scrambleTeamId} />
               </Container>
             </div>
           </div>
