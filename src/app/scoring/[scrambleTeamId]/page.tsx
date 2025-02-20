@@ -4,9 +4,9 @@ import { Container } from "@mui/material";
 export default async function ScoringPage({
   params,
 }: {
-  params: { scrambleTeamId: string };
+  params: Promise<{ scrambleTeamId: string }>;
 }) {
-  //const scrambleId = (await params).scrambleTeamId;
+  const scrambleId = (await params).scrambleTeamId;
 
   return (
     <>
