@@ -3,9 +3,9 @@ import Leaderboard from "@/components/Leaderboard/Leaderboard";
 export default async function LeaderboardPage({
   params,
 }: {
-  params: Promise<{ scrambleId: string }>;
+  params: { scrambleId: string };
 }) {
-  const scrambleId = (await params).scrambleId;
+  const { scrambleId } = params; // No need to await
 
   return (
     <>
