@@ -28,13 +28,8 @@ const MyEventsPage = () => {
   }, []);
 
   const gotoDetails = async (scrambleEventId: string) => {
-    router.push("/myevents/" + scrambleEventId);
+    router.push("/myevents/events/" + scrambleEventId);
   };
-
-  // const gotoTeams = async (scrambleEventId: string) => {
-  //   console.log("Navigating to event:", scrambleEventId); // Debug log
-  //   router.push("/myevents/" + scrambleEventId + "/teams");
-  // };
 
   return (
     <>

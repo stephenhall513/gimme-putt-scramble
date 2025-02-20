@@ -1,8 +1,13 @@
 import ScrambleTeamsList from "@/components/ScrambleTeamsList/ScrambleTeamsList";
 import { Container } from "@mui/material";
 
-export default async function ScrambleTeamsPage() {
-  //const scrambleId = (await params).scrambleId;
+export default async function ScrambleTeamsPage({
+  params,
+}: {
+  params: Promise<{ scrambleEventId: string; scrambleId: string }>;
+}) {
+  const scrambleEventId = (await params).scrambleEventId;
+  const scrambleId = (await params).scrambleId;
 
   return (
     <>
@@ -17,7 +22,7 @@ export default async function ScrambleTeamsPage() {
                 >
                   Scramble Teams Page
                 </div>
-                {/* <ScrambleTeamsList scrambleId={scrambleId} /> */}
+                <ScrambleTeamsList scrambleId={scrambleId} />
               </Container>
             </div>
           </div>

@@ -46,12 +46,18 @@ const ScrambleList = ({ scrambleEventId }: ScrambleListProps) => {
   };
 
   const editScrambleClick = () => {
-    router.push("/myevents/" + scrambleEventId + "/scrambles/" + selected);
+    router.push(
+      "/myevents/events/" + scrambleEventId + "/scrambles/" + selected
+    );
   };
 
   const editScrambleTeamsClick = () => {
     router.push(
-      "/myevents/" + scrambleEventId + "/scrambles/" + selected + "/teams"
+      "/myevents/events/" +
+        scrambleEventId +
+        "/scrambles/" +
+        selected +
+        "/teams"
     );
   };
 
