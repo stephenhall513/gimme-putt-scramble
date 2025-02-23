@@ -29,3 +29,25 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Reducing the size of the MapBox attribution text */
+.mapboxgl-ctrl-attrib {
+  font-size: 10px; /* Smaller font size for the attribution text */
+  padding: 0; /* Remove padding if necessary */
+}
+
+/* Adjusting the size of the MapBox logo */
+.mapboxgl-ctrl-logo {
+  height: 20px; /* Smaller height for the logo */
+  width: auto; /* Maintain aspect ratio */
+}
+
+.mapboxgl-control-container {
+  max-height: 0px;
+}
+.mapboxgl-ctrl-bottom-right {
+  max-height: 0px;
+}
+.mapboxgl-ctrl-bottom-right {
+  max-height: 0px;
+}

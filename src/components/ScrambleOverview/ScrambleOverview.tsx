@@ -1,9 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import { GetScrambleTeam } from "@/api/scramble";
+import { GetScrambleSponsors, GetScrambleTeam } from "@/api/scramble";
 import { format, formatDate } from "date-fns";
 import { ScrambleTeam } from "@/types/Team";
 import { Button } from "@mui/material";
+import SponsorList from "../SponsorList/SponsorList";
+import { ScrambleSponsor } from "@/types/ScrambleSponsor";
 
 interface ScrambleOverviewProps {
   scrambleTeamId: string;
@@ -11,14 +13,20 @@ interface ScrambleOverviewProps {
 
 const ScrambleOverview = ({ scrambleTeamId }: ScrambleOverviewProps) => {
   const [scrambleTeam, setScrambleTeam] = useState<ScrambleTeam>();
+  const [sponsors, setSponsors] = useState<ScrambleSponsor[]>();
 
   useEffect(() => {
     const getScrambleTeam = async () => {
       const response = await GetScrambleTeam(scrambleTeamId);
       if (response.status == 200) {
         const data = await response.data;
-        console.log("Overview", response.data);
         setScrambleTeam(data);
+
+        const sponsorResponse = await GetScrambleSponsors(data.scrambleId);
+
+        if (sponsorResponse.status == 200) {
+          setSponsors(sponsorResponse.data);
+        }
       }
     };
 
@@ -55,14 +63,17 @@ const ScrambleOverview = ({ scrambleTeamId }: ScrambleOverviewProps) => {
             Starting Hole: {scrambleTeam.startingHole}
           </div>
           <div className="py-4">{scrambleTeam.scramble.description}</div>
-          <Button
-            variant="contained"
-            color="primary"
-            size="medium"
-            href={"/scoring/" + scrambleTeamId}
-          >
-            Start Scramble
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              variant="contained"
+              color="primary"
+              size="medium"
+              href={"/scoring/" + scrambleTeamId}
+            >
+              Start Scramble
+            </Button>
+          </div>
+          {sponsors ? <SponsorList sponsors={sponsors} /> : false}
         </div>
       ) : (
         false

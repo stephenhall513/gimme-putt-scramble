@@ -6,7 +6,8 @@ export default async function ScoringPage({
 }: {
   params: Promise<{ scrambleTeamId: string }>;
 }) {
-  const scrambleId = (await params).scrambleTeamId;
+  const scrambleTeamId = (await params).scrambleTeamId;
+  console.log("scrambleTeamId-page", scrambleTeamId);
 
   return (
     <>
@@ -14,7 +15,7 @@ export default async function ScoringPage({
         <div className="py-[15px] md:py-[20px] lg:py-[30px] xl:py-[40px]">
           <div>
             <Container className="bg-[#F8F6F5] rounded-md">
-              <ScoreEntry />
+              <ScoreEntry scrambleTeamId={scrambleTeamId} />
             </Container>
           </div>
         </div>

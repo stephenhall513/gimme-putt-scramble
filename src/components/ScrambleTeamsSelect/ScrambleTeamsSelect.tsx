@@ -2,6 +2,7 @@
 import { fetcher } from "@/api/fetcher";
 import { ScrambleTeam } from "@/types/Team";
 import { Box, Container, Link, Modal } from "@mui/material";
+import { format } from "date-fns";
 import useSWR from "swr";
 
 interface ScrambleTeamsSelectProps {
@@ -28,30 +29,50 @@ const ScrambleTeamsSelect = ({
           justifyContent: "center",
         }}
       >
-        <div>
+        <Box className="max-h-[80vh] overflow-y-auto">
           <div className="py-[15px] md:py-[20px] lg:py-[30px] xl:py-[40px]">
             <div className="container mx-auto">
               <div className="p-2">
-                <Container className="bg-[#F8F6F5] rounded-md p-4">
+                <Container className="bg-[#F8F6F5] rounded-md">
                   {scrambleTeams?.map((scrambleTeam: ScrambleTeam) => {
                     return (
-                      <Link
+                      <div
                         key={scrambleTeam.id}
-                        href={"/scramble/" + scrambleTeam.id}
-                        color="primary"
-                        underline="none"
+                        className="px-10 even:bg-gray-300"
                       >
-                        <div className="py-2 text-center">
-                          <div>{`${scrambleTeam.teamName}`}</div>
-                        </div>
-                      </Link>
+                        <Link
+                          href={"/scramble/" + scrambleTeam.id}
+                          color="primary"
+                          underline="none"
+                        >
+                          <div
+                            className="pt-1 text-md text-center"
+                            style={{ fontFamily: "Russo One" }}
+                          >
+                            {scrambleTeam.teamName}
+                          </div>
+                          <div className="text-sm text-center">
+                            {scrambleTeam.scramble.course?.courseName}
+                          </div>
+                          <div className="text-sm text-center">
+                            {format(
+                              scrambleTeam.scramble.scrambleDate,
+                              "MM/dd/yyyy"
+                            )}
+                          </div>
+                        </Link>
+                        {/* <hr
+                          key={`hr-${scrambleTeam.id}`}
+                          className="mt-2 h-px bg-black border-none w-full opacity-100"
+                        /> */}
+                      </div>
                     );
                   })}
                 </Container>
               </div>
             </div>
           </div>
-        </div>
+        </Box>
       </Modal>
     </>
   );

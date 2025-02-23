@@ -15,3 +15,14 @@ export const GetScore = async (id: string) => {
   );
   return response;
 };
+
+export const GetScrambleHoleInfo = async (
+  scrambleTeamId: string,
+  holeNumber: number
+) => {
+  const response = await axios.get<ScrambleScore>(
+    process.env.NEXT_PUBLIC_API_URL +
+      `/Scramble/HoleInfo/${scrambleTeamId}/${holeNumber}`
+  );
+  return response;
+};

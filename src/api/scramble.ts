@@ -1,4 +1,5 @@
 import { Scramble } from "@/types/Scramble";
+import { ScrambleSponsor } from "@/types/ScrambleSponsor";
 import { ScrambleTeam, ScrambleTeamCreate } from "@/types/Team";
 import axios from "axios";
 
@@ -78,6 +79,13 @@ export const CreateScrambleTeam = async (data: ScrambleTeamCreate) => {
 export const DeleteScrambleTeam = async (id: string) => {
   const response = await axios.post<string>(
     process.env.NEXT_PUBLIC_API_URL + "/Scramble/CreateScrambleTeam" + id
+  );
+  return response;
+};
+
+export const GetScrambleSponsors = async (id: string) => {
+  const response = await axios.get<ScrambleSponsor[]>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/ScrambleSponsors/" + id
   );
   return response;
 };

@@ -1,5 +1,5 @@
 "use client";
-import { AddScores } from "@/api/scoring";
+import { AddScores, GetScrambleHoleInfo } from "@/api/scoring";
 import { ScrambleScore } from "@/types/Score";
 import {
   Button,
@@ -13,29 +13,72 @@ import {
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
 import HoleMap from "../HoleMap";
+import ChevronLeft from "@mui/icons-material/ChevronLeft";
+import ChevronRight from "@mui/icons-material/ChevronRight";
+import { useEffect, useState } from "react";
+import HoleInfo from "../HoleInfo";
+import Loader from "../Loader";
 
-const ScoreEntry = () => {
-  //Get ScrambleTeam Info - Get Current Hole
-  //Get the Coordinates of the Hole Teebox and Back of the Green
-  //
+interface ScoreEntryProps {
+  scrambleTeamId: string;
+}
+
+const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
+  const [showMap, setShowMap] = useState<boolean>(false);
+  const [holeInfo, setHoleInfo] = useState<ScrambleScore>();
+  const [currentHoleNumber, setCurrentHoleNumber] = useState<number>(0);
+  const [nextHoleNumber, setNextHoleNumber] = useState<number>(0);
+  const [prevHoleNumber, setPrevHoleNumber] = useState<number>(0);
+  const point1 = { lng: -84.3173979, lat: 39.0476951 };
+  const point2 = { lng: -84.3179987, lat: 39.0506613 };
+
+  useEffect(() => {
+    const getHoleInfo = async () => {
+      const response = await GetScrambleHoleInfo(
+        scrambleTeamId,
+        currentHoleNumber
+      );
+
+      if (response.status === 200) {
+        setHoleInfo(response.data);
+        const hole = response.data.hole;
+
+        if (hole) {
+          setNextHoleNumber(hole.holeNumber === 18 ? 1 : hole.holeNumber + 1);
+          setPrevHoleNumber(hole.holeNumber === 1 ? 18 : hole.holeNumber - 1);
+        }
+      }
+    };
+
+    getHoleInfo();
+  }, [currentHoleNumber, scrambleTeamId]);
 
   const formik = useFormik({
     initialValues: {
-      scrambleTeamId: "",
-      holeId: "",
-      strokes: 0,
+      scrambleTeamId: scrambleTeamId,
+      holeId: holeInfo?.holeId,
+      strokes: holeInfo ? holeInfo.strokes : 0,
+      submitAction: "",
     },
     onSubmit: async (values) => {
       const scrambleScore: ScrambleScore = {
-        scrambleTeamId: values.scrambleTeamId,
-        holeId: values.holeId,
+        scrambleTeamId: holeInfo?.scrambleTeamId ? holeInfo.scrambleTeamId : "",
+        holeId: holeInfo?.holeId ? holeInfo.holeId : "",
+        scrambleScoreId: holeInfo?.scrambleScoreId,
         strokes: values.strokes,
       };
 
-      const response = await AddScores(scrambleScore);
       try {
-        if (response.status == 200) {
+        const response = await AddScores(scrambleScore);
+        if (response.status === 200) {
           toast.success("Score Saved");
+
+          // Navigate based on the submit action
+          if (values.submitAction === "next") {
+            setCurrentHoleNumber(nextHoleNumber);
+          } else if (values.submitAction === "prev") {
+            setCurrentHoleNumber(prevHoleNumber);
+          }
         }
       } catch (error) {
         toast.error("There was a Problem Saving Score");
@@ -43,71 +86,120 @@ const ScoreEntry = () => {
     },
   });
 
+  useEffect(() => {
+    if (holeInfo) {
+      formik.setValues((prevValues) => ({
+        ...prevValues,
+        holeId: holeInfo.holeId,
+        strokes: holeInfo.strokes,
+      }));
+    }
+  }, [holeInfo]);
+
   return (
     <>
-      <form>
-        <Grid2 container rowSpacing={2}>
-          <Grid2>
-            <FormControl
-              component="fieldset"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
+      {!holeInfo ? (
+        <Loader />
+      ) : (
+        <div className="h-screen flex flex-col w-full">
+          {holeInfo.hole ? <HoleInfo hole={holeInfo.hole} /> : false}
+          <div className="flex flex-col justify-center">
+            <Button
+              size="small"
+              onClick={() => {
+                setShowMap((currentShowMap) => !currentShowMap);
               }}
             >
-              <FormLabel
-                id="multiple-group-label"
-                className="text-black"
-                color="info"
-                style={{
-                  marginRight: 20,
-                  fontWeight: "bold",
-                  color: "#000000",
-                }}
-              >
-                Score
-              </FormLabel>
-              <RadioGroup
-                name="strokes"
-                onChange={formik.handleChange}
-                style={{ flexDirection: "row" }}
-              >
-                <FormControlLabel value="1" control={<Radio />} label="1" />
-                <FormControlLabel value="2" control={<Radio />} label="2" />
-                <FormControlLabel value="3" control={<Radio />} label="3" />
-                <FormControlLabel value="4" control={<Radio />} label="4" />
-                <FormControlLabel value="5" control={<Radio />} label="5" />
-                <FormControlLabel value="6" control={<Radio />} label="6" />
-                <FormControlLabel value="7" control={<Radio />} label="7" />
-                <FormControlLabel value="8" control={<Radio />} label="8" />
-                <FormControlLabel value="9" control={<Radio />} label="9" />
-                <FormControlLabel value="10" control={<Radio />} label="10" />
-              </RadioGroup>
-              {formik.errors.strokes && formik.touched.strokes ? (
-                <div className="text-xs text-red-600">
-                  {formik.errors.strokes}
-                </div>
-              ) : (
-                false
-              )}
-            </FormControl>
-          </Grid2>
-          <Grid2>
-            <Button type="submit" variant="contained" color="primary">
-              Previous
+              {showMap ? "Close Map" : "Show Map"}
             </Button>
-          </Grid2>
-          <Grid2>
-            <Button type="submit" variant="contained" color="primary">
-              Next
-            </Button>
-          </Grid2>
-          <Grid2>
-            <HoleMap />
-          </Grid2>
-        </Grid2>
-      </form>
+          </div>
+          {showMap ? (
+            <div
+              key={"hole-" + showMap}
+              className="mx-auto"
+              style={{ width: "100%", height: "100%" }}
+            >
+              <HoleMap key={Date.now()} point1={point1} point2={point2} />
+            </div>
+          ) : (
+            <div>
+              <form onSubmit={formik.handleSubmit}>
+                <Grid2 container rowSpacing={2}>
+                  <Grid2 size={{ sm: 12 }} className="w-full">
+                    <div className="flex flex-row justify-between w-full">
+                      <Button
+                        type="submit"
+                        variant="text"
+                        color="primary"
+                        onClick={() =>
+                          formik.setFieldValue("submitAction", "prev")
+                        }
+                      >
+                        <ChevronLeft /> Previous
+                      </Button>
+
+                      <Button
+                        type="submit"
+                        variant="text"
+                        color="primary"
+                        onClick={() =>
+                          formik.setFieldValue("submitAction", "next")
+                        }
+                      >
+                        Next <ChevronRight />
+                      </Button>
+                    </div>
+                  </Grid2>
+
+                  <Grid2 className="flex flex-col justify-center w-full">
+                    <FormControl
+                      component="fieldset"
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                      }}
+                    >
+                      <FormLabel
+                        id="multiple-group-label"
+                        className="text-black"
+                        color="info"
+                        style={{
+                          marginRight: 20,
+                          fontWeight: "bold",
+                          color: "#000000",
+                        }}
+                      >
+                        Enter Score for the Hole
+                      </FormLabel>
+                      <RadioGroup
+                        name="strokes"
+                        onChange={formik.handleChange}
+                        style={{ flexDirection: "row" }}
+                        value={formik.values.strokes}
+                      >
+                        {[...Array(10)].map((_, i) => (
+                          <FormControlLabel
+                            key={i + 1}
+                            value={(i + 1).toString()}
+                            control={<Radio />}
+                            label={(i + 1).toString()}
+                          />
+                        ))}
+                      </RadioGroup>
+                      {formik.errors.strokes && formik.touched.strokes ? (
+                        <div className="text-xs text-red-600">
+                          {formik.errors.strokes}
+                        </div>
+                      ) : null}
+                    </FormControl>
+                  </Grid2>
+                </Grid2>
+              </form>
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 };

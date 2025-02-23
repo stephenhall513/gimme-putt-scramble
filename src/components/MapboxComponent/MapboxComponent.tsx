@@ -26,24 +26,26 @@ const MapBoxComponent: React.FC<MapBoxComponentProps> = ({
         container: mapContainer.current,
         style: "mapbox://styles/altabos/cm2pfh250002901ntbr6v1agh",
         center: [(point1.lng + point2.lng) / 2, (point1.lat + point2.lat) / 2],
-        zoom: 17,
+        zoom: 16.5,
       });
 
       map.addControl(new mapboxgl.NavigationControl());
 
-      new mapboxgl.Marker().setLngLat([point1.lng, point1.lat]).addTo(map);
+      //new mapboxgl.Marker().setLngLat([point1.lng, point1.lat]).addTo(map);
 
-      new mapboxgl.Marker().setLngLat([point2.lng, point2.lat]).addTo(map);
+      //new mapboxgl.Marker().setLngLat([point2.lng, point2.lat]).addTo(map);
 
       map.on("load", () => {
         const bounds = new mapboxgl.LngLatBounds();
         bounds.extend([point1.lng, point1.lat]);
         bounds.extend([point2.lng, point2.lat]);
-        map.fitBounds(bounds, { padding: 60 });
+        map.fitBounds(bounds, { padding: 20 });
 
         const bearing = calculateBearing(point1, point2);
         map.rotateTo(bearing, { duration: 0 });
       });
+
+      console.log("Component rerendered!");
     }
   }, [point1, point2]);
 
@@ -73,7 +75,7 @@ const MapBoxComponent: React.FC<MapBoxComponentProps> = ({
     return (degrees * Math.PI) / 180;
   }
 
-  return <div ref={mapContainer} style={{ width: "90%", height: "700px" }} />;
+  return <div ref={mapContainer} style={{ width: "100%", height: "90%" }} />;
 };
 
 export default MapBoxComponent;

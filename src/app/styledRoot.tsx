@@ -33,7 +33,7 @@ export function StyledRoot({
             >
               <MenuIcon color="secondary" />
             </IconButton> */}
-              <div className="bg-black flex flex-col items-center m-6">
+              <div className="bg-black flex flex-col items-center mx-6 mt-0">
                 <Link href="/">
                   <div className="flex justify-center items-center pb-4">
                     <Image

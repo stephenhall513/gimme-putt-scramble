@@ -1,13 +1,17 @@
 "use client";
+import { useEffect } from "react";
 import MapBoxComponent, {
   Coordinates,
 } from "../MapboxComponent/MapboxComponent";
 
-const HoleMap = () => {
-  const point1 = { lng: -84.3173979, lat: 39.0476951 };
-  const point2 = { lng: -84.3179987, lat: 39.0506613 };
+interface HoleMapProps {
+  point1: Coordinates;
+  point2: Coordinates;
+}
+
+const HoleMap = ({ point1, point2 }: HoleMapProps) => {
   return (
-    <div>
+    <div className="mx-auto" style={{ width: "100%", height: "90%" }}>
       <MapBoxComponent point1={point1} point2={point2} />
     </div>
   );
