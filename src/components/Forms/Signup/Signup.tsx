@@ -105,7 +105,7 @@ const Signup = ({ onSuccess }: SignupProps) => {
         organizerEmail: values.email,
         organizerPhone: values.phone,
         eventLogo: "",
-        hasMultipeScrambles: values.multiple == "yes" ? true : false,
+        hasMultipleScrambles: values.multiple == "yes" ? true : false,
         isPaid: false,
       };
 
