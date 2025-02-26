@@ -29,11 +29,7 @@ const Event = ({ eventId }: EventProps) => {
     <>
       <EventLogo src={eventData.eventLogo} alt={eventData.eventName} />
       <EventInfo scrambleEvent={eventData} />
-      {eventData.sponsors ? (
-        <SponsorList sponsors={eventData.sponsors} />
-      ) : (
-        false
-      )}
+      {eventData.sponsors ? <SponsorList scrambleEventId={eventId} /> : false}
       <Link href={`/blog/${eventData.id}`}>Scramble Info</Link>
     </>
   ) : (
