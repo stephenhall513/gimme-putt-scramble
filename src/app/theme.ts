@@ -8,13 +8,9 @@ export const themeOptions: ThemeOptions = {
     primary: {
       main: "#2E4706",
       contrastText: "#FFFFFF",
-      light: "#4C760A",
-      dark: "#0e1502",
     },
     secondary: {
       main: "#7DB534",
-      dark: "#4b6d1f",
-      light: "#b1d385",
     },
     info: {
       main: "#FFFFFF",
@@ -59,6 +55,7 @@ export const themeOptions: ThemeOptions = {
         },
       },
     },
+    MuiButton: {},
   },
 };
 

@@ -2,7 +2,7 @@ import { Course } from "./Course";
 
 export type Scramble = {
   eventId: string;
-  scrambleId?: string;
+  id?: string;
   scrambleCode: string;
   scrambleName: string;
   description: string;

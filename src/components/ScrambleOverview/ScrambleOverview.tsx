@@ -73,7 +73,6 @@ const ScrambleOverview = ({ scrambleTeamId }: ScrambleOverviewProps) => {
               Start Scramble
             </Button>
           </div>
-          {sponsors ? <SponsorList sponsors={sponsors} /> : false}
         </div>
       ) : (
         false

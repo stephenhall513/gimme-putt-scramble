@@ -168,7 +168,7 @@ const ScrambleList = ({ scrambleEventId }: ScrambleListProps) => {
           />
         </div>
       ) : (
-        <div>Is Loading...</div>
+        false
       )}
     </>
   );

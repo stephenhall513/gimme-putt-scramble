@@ -1,8 +1,8 @@
 "use client";
 import {
-  CreateScrambleEvent,
   GetScrambleEvent,
   UpdateScrambleEvent,
+  UploadScrambleEventLogo,
 } from "@/api/scrambleEvent";
 import { ScrambleEvent } from "@/types/ScrambleEvent";
 import {
@@ -28,6 +28,8 @@ import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { styled } from "@mui/material/styles";
 import EventDetails from "@/components/EventDetails/EventDetails";
+import Link from "next/link";
+import Loader from "@/components/Loader";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -64,20 +66,24 @@ const ScrambleEventEditForm = ({
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [scrambleEvent, setScrambleEvent] = useState<ScrambleEvent>();
 
-  const stableScrambleEventId = useMemo(
-    () => scrambleEventId,
-    [scrambleEventId]
-  );
-
   useEffect(() => {
+    if (!scrambleEventId) return; // Prevent fetching if scrambleEventId is not available
+
     const getScrambleEvent = async () => {
-      const response = await GetScrambleEvent(scrambleEventId);
-      if (response.status == 200) {
-        setScrambleEvent(response.data);
+      console.log("Fetching scramble event for ID:", scrambleEventId);
+      try {
+        const response = await GetScrambleEvent(scrambleEventId);
+        if (response.status === 200) {
+          setScrambleEvent(response.data);
+        } else {
+          console.error("Failed to fetch event:", response);
+        }
+      } catch (error) {
+        console.error("Error fetching scramble event:", error);
       }
     };
     getScrambleEvent();
-  }, [stableScrambleEventId]);
+  }, [scrambleEventId]);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -96,38 +102,60 @@ const ScrambleEventEditForm = ({
       endDate: scrambleEvent
         ? format(scrambleEvent?.endDate, "MM/dd/yyyy")
         : new Date(),
-      multiple: scrambleEvent?.hasMultipeScrambles == true ? "yes" : "no",
+      multiple: scrambleEvent?.hasMultipleScrambles == true ? "yes" : "no",
       eventLogo: scrambleEvent ? scrambleEvent?.eventLogo : "",
+      file: null,
     },
     validationSchema: ScrambleEventEditSchema,
     onSubmit: async (values) => {
       const scrambleEvent: ScrambleEvent = {
+        id: scrambleEventId,
         golferId: values.golferId,
         eventName: values.eventName,
         description: values.description,
         startDate: new Date(values.startDate),
         endDate: new Date(values.endDate),
         organizationName: values.organizationName,
-        isNonprofit: values.isNonprofit == "Yes" ? true : false,
+        isNonprofit: values.isNonprofit == "yes" ? true : false,
         organizerName: values.organizerName,
         organizerEmail: values.email,
         organizerPhone: values.phone,
         eventLogo: values.eventLogo,
-        hasMultipeScrambles: values.multiple == "Yes" ? true : false,
+        hasMultipleScrambles: values.multiple == "yes" ? true : false,
         isPaid: false,
       };
 
       const response = await UpdateScrambleEvent(scrambleEvent);
       try {
         if (response.status == 200) {
+          if (formik.values.file) {
+            const uploadResponse = await UploadScrambleEventLogo(
+              scrambleEventId,
+              formik.values.file
+            );
+          }
           const id = response.data;
           toast.success("Event Updated");
+          const refreshResponse = await GetScrambleEvent(scrambleEventId);
+          if (response.status == 200) {
+            setScrambleEvent(refreshResponse.data);
+          }
+          setIsEdit(false);
         }
       } catch (error) {
         toast.error("There was a Problem Updating Event");
       }
     },
   });
+
+  if (!scrambleEventId) {
+    return <Loader />; // Show a loader until scrambleEventId is available
+  }
+
+  if (!scrambleEvent) {
+    return <Loader />; // Show a loader until scrambleEvent is fetched
+  }
+
   return (
     <>
       {isEdit ? (
@@ -183,7 +211,12 @@ const ScrambleEventEditForm = ({
                       <RadioGroup
                         id="isNonprofit"
                         name="isNonprofit"
-                        onChange={formik.handleChange}
+                        onChange={(event) =>
+                          formik.setFieldValue(
+                            "isNonprofit",
+                            event.target.value
+                          )
+                        }
                         style={{ flexDirection: "row" }}
                         value={formik.values.isNonprofit}
                       >
@@ -364,7 +397,9 @@ const ScrambleEventEditForm = ({
                       </FormLabel>
                       <RadioGroup
                         name="multiple"
-                        onChange={formik.handleChange}
+                        onChange={(event) =>
+                          formik.setFieldValue("multiple", event.target.value)
+                        }
                         style={{ flexDirection: "row" }}
                         value={formik.values.multiple}
                       >
@@ -399,8 +434,13 @@ const ScrambleEventEditForm = ({
                       Upload Event Logo
                       <VisuallyHiddenInput
                         type="file"
-                        onChange={(event) => console.log(event.target.files)}
-                        multiple
+                        accept="image/*"
+                        onChange={(event) => {
+                          const file = event.currentTarget.files?.[0];
+                          if (file) {
+                            formik.setFieldValue("file", file);
+                          }
+                        }}
                       />
                     </Button>
                   </Grid2>
@@ -443,14 +483,33 @@ const ScrambleEventEditForm = ({
         </div>
       ) : (
         <>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setIsEdit(true)}
-          >
-            Edit Event
-          </Button>
-          <EventDetails scrambleEventId={scrambleEventId} />
+          <div className="flex flex-row">
+            <div className="flex-2 my-4 mr-4">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setIsEdit(true)}
+              >
+                Edit Event
+              </Button>
+            </div>
+            <div className="flex-2 my-4">
+              <Link href={`/myevents/events/${scrambleEventId}/sponsors`}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  title="Manage Sponsors"
+                  size="medium"
+                >
+                  Manage Sponsors
+                </Button>
+              </Link>
+            </div>
+          </div>
+          <EventDetails
+            scrambleEventId={scrambleEventId}
+            refreshTrigger={isEdit}
+          />
         </>
       )}
     </>

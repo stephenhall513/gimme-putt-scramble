@@ -12,7 +12,7 @@ interface HoleInfoProp {
 const HoleInfo = ({ hole }: HoleInfoProp) => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
+
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [yardage, setYardage] = useState<HoleYardage>();
   const [yardageModalVisible, setYardageModalVisible] =
@@ -26,12 +26,6 @@ const HoleInfo = ({ hole }: HoleInfoProp) => {
 
     setIsLoading(false);
   }, []);
-
-  const getLeaderboard = async () => {
-    setShowLeaderboard(true);
-  };
-
-  const viewScorecard = async () => {};
 
   return (
     <>
@@ -50,24 +44,6 @@ const HoleInfo = ({ hole }: HoleInfoProp) => {
         </a>
         <div className="text-black text-center">
           Par {hole?.par} {" | "} Handicap: {hole?.handicap}
-        </div>
-        <div className="flex flex-row justify-evenly">
-          <Button
-            variant="text"
-            size="small"
-            className="flex-1 color-[#8cc63f] text-xs my-5 text-center"
-            onClick={() => getLeaderboard()}
-          >
-            Leaderboard
-          </Button>
-          <Button
-            variant="text"
-            size="small"
-            className="flex-1 color-[#8cc63f] text-xs my-5 text-center"
-            onClick={() => viewScorecard()}
-          >
-            Scorecard
-          </Button>
         </div>
       </div>
     </>

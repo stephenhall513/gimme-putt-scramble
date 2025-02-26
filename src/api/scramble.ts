@@ -1,3 +1,4 @@
+import { Scorecard } from "@/types/Scorecard";
 import { Scramble } from "@/types/Scramble";
 import { ScrambleSponsor } from "@/types/ScrambleSponsor";
 import { ScrambleTeam, ScrambleTeamCreate } from "@/types/Team";
@@ -83,9 +84,37 @@ export const DeleteScrambleTeam = async (id: string) => {
   return response;
 };
 
+export const CreateScrambleSponsor = async (data: ScrambleSponsor) => {
+  const response = await axios.post<string>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/CreateSponsor",
+    data
+  );
+  return response;
+};
+
+export const UploadScrambleLogo = async (id: string, file: File) => {
+  const formData = new FormData();
+  formData.append("file", file); // Append the file.
+
+  const response = await axios.post(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/UploadSponsorLogo/" + id,
+    formData
+  );
+  return response;
+};
+
 export const GetScrambleSponsors = async (id: string) => {
   const response = await axios.get<ScrambleSponsor[]>(
     process.env.NEXT_PUBLIC_API_URL + "/Scramble/ScrambleSponsors/" + id
+  );
+  return response;
+};
+
+export const GetScrambleScorecard = async (scrambleTeamId: string) => {
+  const response = await axios.get<Scorecard>(
+    process.env.NEXT_PUBLIC_API_URL +
+      "/Scramble/ScrambleScorecard/" +
+      scrambleTeamId
   );
   return response;
 };

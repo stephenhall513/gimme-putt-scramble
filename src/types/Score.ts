@@ -1,5 +1,6 @@
 import { Hole } from "./Hole";
 import { HoleCoordinate } from "./HoleCoordinate";
+import { ScrambleSponsor } from "./ScrambleSponsor";
 
 export type ScrambleScore = {
   scrambleScoreId?: string;
@@ -8,4 +9,5 @@ export type ScrambleScore = {
   strokes: number;
   hole?: Hole;
   coordinates?: HoleCoordinate[];
+  sponsors?: ScrambleSponsor[];
 };

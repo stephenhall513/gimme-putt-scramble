@@ -1,4 +1,5 @@
 import ScrambleEventEditForm from "@/components/Forms/ScrambleEventEditForm/ScrambleEventEditForm";
+import Loader from "@/components/Loader";
 import ScrambleList from "@/components/ScrambleList/ScrambleList";
 import { Breadcrumbs, Container, Typography } from "@mui/material";
 import Link from "next/link";
@@ -9,6 +10,10 @@ export default async function ScrambleEventPage({
   params: Promise<{ scrambleEventId: string }>;
 }) {
   const scrambleEventId = (await params).scrambleEventId;
+
+  if (!scrambleEventId) {
+    return <Loader />; // Show a loader until scrambleEventId is available
+  }
 
   return (
     <>
@@ -23,8 +28,10 @@ export default async function ScrambleEventPage({
                 <Typography sx={{ color: "#FFFFFF" }}>Event</Typography>
               </Breadcrumbs>
               <Container className="bg-[#F8F6F5] rounded-md p-4">
-                <ScrambleEventEditForm scrambleEventId={scrambleEventId} />
-                <ScrambleList scrambleEventId={scrambleEventId} />
+                <>
+                  <ScrambleEventEditForm scrambleEventId={scrambleEventId} />
+                  <ScrambleList scrambleEventId={scrambleEventId} />
+                </>
               </Container>
             </div>
           </div>

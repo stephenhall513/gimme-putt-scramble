@@ -7,9 +7,13 @@ import { useEffect, useState } from "react";
 
 interface EventDetailsProps {
   scrambleEventId: string;
+  refreshTrigger: boolean;
 }
 
-const EventDetails = ({ scrambleEventId }: EventDetailsProps) => {
+const EventDetails = ({
+  scrambleEventId,
+  refreshTrigger,
+}: EventDetailsProps) => {
   const [scrambleEvent, setScrambleEvent] = useState<ScrambleEvent>();
 
   useEffect(() => {
@@ -20,17 +24,23 @@ const EventDetails = ({ scrambleEventId }: EventDetailsProps) => {
       }
     };
     getScrambleEvent();
-  }, []);
+  }, [scrambleEventId, refreshTrigger]);
 
   return (
-    <Box
-      borderColor="#000000"
-      border={1}
-      borderRadius={2}
-      padding={4}
-      marginTop={4}
-    >
+    <Box borderColor="#000000" border={1} borderRadius={2} padding={4}>
       <Grid2 container spacing={1} rowSpacing={2}>
+        <Grid2 size={{ sm: 12 }}>
+          {scrambleEvent?.eventLogo ? (
+            <Image
+              alt={scrambleEvent.eventName}
+              src={scrambleEvent?.eventLogo}
+              height={200}
+              width={200}
+            />
+          ) : (
+            false
+          )}
+        </Grid2>
         <Grid2 size={{ lg: 6, md: 6, sm: 12 }}>
           <span className="font-bold mr-2">Organization:</span>
           {scrambleEvent?.organizationName}
@@ -73,19 +83,7 @@ const EventDetails = ({ scrambleEventId }: EventDetailsProps) => {
           <span className="font-bold mr-2">
             Are you going to have multiple sites/scrambles for your event?
           </span>
-          {scrambleEvent?.hasMultipeScrambles == true ? "Yes" : "No"}
-        </Grid2>
-        <Grid2>
-          {scrambleEvent?.eventLogo ? (
-            <Image
-              alt={scrambleEvent.eventName}
-              src={scrambleEvent?.eventLogo}
-              height={50}
-              width={50}
-            />
-          ) : (
-            false
-          )}
+          {scrambleEvent?.hasMultipleScrambles == true ? "Yes" : "No"}
         </Grid2>
       </Grid2>
     </Box>

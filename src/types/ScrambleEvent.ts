@@ -13,7 +13,7 @@ export type ScrambleEvent = {
   organizerEmail: string;
   organizerPhone: string;
   eventLogo: string;
-  hasMultipeScrambles: boolean;
+  hasMultipleScrambles: boolean;
   isPaid: boolean;
   sponsors?: ScrambleSponsor[];
 };

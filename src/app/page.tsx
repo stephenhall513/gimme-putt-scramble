@@ -2,10 +2,8 @@
 import ScrambleCode from "@/components/Forms/ScrambleCode/ScrambleCode";
 import ScrambleEntry from "@/components/Forms/ScrambleEntry/ScrambleEntry";
 import ScrambleTeamsSelect from "@/components/ScrambleTeamsSelect/ScrambleTeamsSelect";
-import { ScrambleTeam } from "@/types/Team";
 import { Container } from "@mui/material";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 export default function Home() {
   return (

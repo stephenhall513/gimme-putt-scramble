@@ -9,15 +9,27 @@ import {
   Grid2,
   RadioGroup,
   Radio,
+  Card,
+  CardContent,
+  ButtonGroup,
 } from "@mui/material";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
 import HoleMap from "../HoleMap";
 import ChevronLeft from "@mui/icons-material/ChevronLeft";
 import ChevronRight from "@mui/icons-material/ChevronRight";
+import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import { useEffect, useState } from "react";
 import HoleInfo from "../HoleInfo";
 import Loader from "../Loader";
+import ScrambleScorecard from "../ScrambleScorecard/ScrambleScorecard";
+import { GetScrambleScorecard, GetScrambleTeam } from "@/api/scramble";
+import { Scorecard } from "@/types/Scorecard";
+import { Coordinates } from "../MapboxComponent/MapboxComponent";
+import Leaderboard from "../Leaderboard/Leaderboard";
+import { ScrambleTeam } from "@/types/Team";
+import HoleSponsor from "../HoleSponsor/HoleSponsor";
+import { ScrambleSponsor } from "@/types/ScrambleSponsor";
 
 interface ScoreEntryProps {
   scrambleTeamId: string;
@@ -29,10 +41,38 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
   const [currentHoleNumber, setCurrentHoleNumber] = useState<number>(0);
   const [nextHoleNumber, setNextHoleNumber] = useState<number>(0);
   const [prevHoleNumber, setPrevHoleNumber] = useState<number>(0);
-  const point1 = { lng: -84.3173979, lat: 39.0476951 };
-  const point2 = { lng: -84.3179987, lat: 39.0506613 };
+  const [scrambleTeam, setScrambleTeam] = useState<ScrambleTeam>();
+  const [bottomPoint, setBottomPoint] = useState<Coordinates>({
+    lng: -84.3173979,
+    lat: 39.0476951,
+  });
+  const [topPoint, setTopPoint] = useState<Coordinates>({
+    lng: -84.3179987,
+    lat: 39.0506613,
+  });
+
+  const [scorecard, setScorecard] = useState<Scorecard>();
+  const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
+  const [showScorecard, setShowScorecard] = useState<boolean>(false);
+  const [showScoring, setShowScoring] = useState<boolean>(true);
 
   useEffect(() => {
+    const getScorecard = async () => {
+      const response = await GetScrambleScorecard(scrambleTeamId);
+      console.log("Scorecard", response);
+      if (response.status == 200) {
+        setScorecard(response.data);
+      }
+    };
+
+    const getTeam = async () => {
+      const response = await GetScrambleTeam(scrambleTeamId);
+      console.log("ScrambleTeam", response);
+      if (response.status == 200) {
+        setScrambleTeam(response.data);
+      }
+    };
+
     const getHoleInfo = async () => {
       const response = await GetScrambleHoleInfo(
         scrambleTeamId,
@@ -40,17 +80,41 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
       );
 
       if (response.status === 200) {
-        setHoleInfo(response.data);
         const hole = response.data.hole;
+
+        if (hole?.coordinates) {
+          const teeboxPoint = hole.coordinates.filter((x) => x.poi == 11)[0];
+          const greenPoint = hole.coordinates.filter(
+            (x) => x.poi == 1 && x.location == 3
+          )[0];
+
+          const coordinate1: Coordinates = {
+            lat: teeboxPoint.latitude,
+            lng: teeboxPoint.longitude,
+          };
+
+          setBottomPoint(coordinate1);
+
+          const coordinate2: Coordinates = {
+            lat: greenPoint.latitude,
+            lng: greenPoint.longitude,
+          };
+
+          setTopPoint(coordinate2);
+        }
 
         if (hole) {
           setNextHoleNumber(hole.holeNumber === 18 ? 1 : hole.holeNumber + 1);
           setPrevHoleNumber(hole.holeNumber === 1 ? 18 : hole.holeNumber - 1);
         }
+
+        setHoleInfo(response.data);
       }
     };
 
+    getScorecard();
     getHoleInfo();
+    getTeam();
   }, [currentHoleNumber, scrambleTeamId]);
 
   const formik = useFormik({
@@ -96,61 +160,137 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
     }
   }, [holeInfo]);
 
+  const viewScoring = async () => {
+    if (showScoring) {
+      setShowScorecard(false);
+      setShowScoring(true);
+      setShowMap(false);
+      setShowLeaderboard(false);
+    } else {
+      setShowScorecard(false);
+      setShowScoring(true);
+      setShowMap(false);
+      setShowLeaderboard(false);
+    }
+  };
+
+  const viewMap = () => {
+    if (showMap) {
+      setShowMap(false);
+      setShowScoring(true);
+      setShowScorecard(false);
+      setShowLeaderboard(false);
+    } else {
+      setShowMap(true);
+      setShowLeaderboard(false);
+      setShowScoring(false);
+      setShowScorecard(false);
+    }
+  };
+
+  const viewLeaderboard = async () => {
+    if (showLeaderboard) {
+      setShowLeaderboard(false);
+      setShowScoring(true);
+      setShowMap(false);
+      setShowScorecard(false);
+    } else {
+      setShowLeaderboard(true);
+      setShowScoring(false);
+      setShowMap(false);
+      setShowScorecard(false);
+    }
+  };
+
+  const viewScorecard = async () => {
+    if (showScorecard) {
+      setShowScorecard(false);
+      setShowScoring(true);
+      setShowMap(false);
+      setShowLeaderboard(false);
+    } else {
+      setShowScorecard(true);
+      setShowScoring(false);
+      setShowMap(false);
+      setShowLeaderboard(false);
+    }
+  };
+
   return (
     <>
       {!holeInfo ? (
         <Loader />
       ) : (
-        <div className="h-screen flex flex-col w-full">
-          {holeInfo.hole ? <HoleInfo hole={holeInfo.hole} /> : false}
-          <div className="flex flex-col justify-center">
-            <Button
-              size="small"
-              onClick={() => {
-                setShowMap((currentShowMap) => !currentShowMap);
-              }}
-            >
-              {showMap ? "Close Map" : "Show Map"}
-            </Button>
-          </div>
-          {showMap ? (
-            <div
-              key={"hole-" + showMap}
-              className="mx-auto"
-              style={{ width: "100%", height: "100%" }}
-            >
-              <HoleMap key={Date.now()} point1={point1} point2={point2} />
-            </div>
-          ) : (
-            <div>
-              <form onSubmit={formik.handleSubmit}>
-                <Grid2 container rowSpacing={2}>
-                  <Grid2 size={{ sm: 12 }} className="w-full">
-                    <div className="flex flex-row justify-between w-full">
-                      <Button
-                        type="submit"
-                        variant="text"
-                        color="primary"
-                        onClick={() =>
-                          formik.setFieldValue("submitAction", "prev")
-                        }
-                      >
-                        <ChevronLeft /> Previous
-                      </Button>
+        <div className="h-full flex flex-col">
+          <form onSubmit={formik.handleSubmit}>
+            {holeInfo.hole ? <HoleInfo hole={holeInfo.hole} /> : false}
+            <Grid2 container rowSpacing={2}>
+              <Grid2 size={{ sm: 12 }} className="w-full">
+                <div className="flex flex-row justify-between w-full">
+                  <Button
+                    type="submit"
+                    variant="text"
+                    color="primary"
+                    onClick={() => formik.setFieldValue("submitAction", "prev")}
+                  >
+                    <ChevronLeft /> Previous
+                  </Button>
 
-                      <Button
-                        type="submit"
-                        variant="text"
-                        color="primary"
-                        onClick={() =>
-                          formik.setFieldValue("submitAction", "next")
-                        }
-                      >
-                        Next <ChevronRight />
-                      </Button>
-                    </div>
-                  </Grid2>
-
+                  <Button
+                    type="submit"
+                    variant="text"
+                    color="primary"
+                    onClick={() => formik.setFieldValue("submitAction", "next")}
+                  >
+                    Next <ChevronRight />
+                  </Button>
+                </div>
+              </Grid2>
+              <Grid2 className="flex flex-row justify-evenly w-full">
+                <div>
+                  <ButtonGroup>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color={showScoring ? "primary" : "secondary"}
+                      onClick={() => viewScoring()}
+                      style={{ fontSize: "8pt" }}
+                    >
+                      Entry
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color={showScorecard ? "primary" : "secondary"}
+                      onClick={() => viewScorecard()}
+                      style={{ fontSize: "8pt" }}
+                    >
+                      Scorecard
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color={showMap ? "primary" : "secondary"}
+                      style={{ fontSize: "8pt" }}
+                      onClick={() => viewMap()}
+                    >
+                      Map
+                      {/* {showMap ? "Close Map" : "Show Map"} */}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      color={showLeaderboard ? "primary" : "secondary"}
+                      style={{ fontSize: "8pt" }}
+                      onClick={() => viewLeaderboard()}
+                    >
+                      Leaderboard
+                    </Button>
+                  </ButtonGroup>
+                </div>
+              </Grid2>
+              {showScoring ? (
+                <>
                   <Grid2 className="flex flex-col justify-center w-full">
                     <FormControl
                       component="fieldset"
@@ -194,10 +334,48 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                       ) : null}
                     </FormControl>
                   </Grid2>
-                </Grid2>
-              </form>
-            </div>
-          )}
+                  {holeInfo.sponsors ? (
+                    <div className="flex flex-col justify-center w-full">
+                      {holeInfo.sponsors.map((sponsor: ScrambleSponsor) => (
+                        <HoleSponsor key={sponsor.id} sponsor={sponsor} />
+                      ))}
+                    </div>
+                  ) : (
+                    false
+                  )}
+                </>
+              ) : (
+                false
+              )}
+            </Grid2>
+            {showMap ? (
+              <div key={"hole-" + showMap} className="mx-auto h-svh pt-5">
+                <HoleMap
+                  key={Date.now()}
+                  point1={bottomPoint}
+                  point2={topPoint}
+                />
+              </div>
+            ) : (
+              false
+            )}
+            {showLeaderboard && scrambleTeam ? (
+              <div className="pt-5">
+                <Leaderboard scrambleId={scrambleTeam?.scrambleId} />
+              </div>
+            ) : (
+              false
+            )}
+            {showScorecard && scorecard ? (
+              <Card className="p-2 max-w-4xl mx-auto mt-5">
+                <CardContent className="overflow=x-auto">
+                  <ScrambleScorecard scorecard={scorecard} />
+                </CardContent>
+              </Card>
+            ) : (
+              false
+            )}
+          </form>
         </div>
       )}
     </>

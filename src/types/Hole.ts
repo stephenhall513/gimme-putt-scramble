@@ -1,5 +1,6 @@
 import { Coordinates } from "@/components/MapboxComponent/MapboxComponent";
 import { TeeBox } from "./TeeBox";
+import { HoleCoordinate } from "./HoleCoordinate";
 
 export type Hole = {
   id: string;
@@ -13,5 +14,5 @@ export type Hole = {
   handicap9: number;
   hasCoordinated: boolean;
   teeBox: TeeBox;
-  coordinates: Coordinates;
+  coordinates: HoleCoordinate[];
 };

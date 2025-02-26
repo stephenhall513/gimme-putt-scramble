@@ -1,7 +1,8 @@
 import { Scramble } from "./Scramble";
 
-export type ScrambleTeam = {
-  id: string;
+export type ScrambleLeaderboard = {
+  scrambleTeamId: string;
+  rank: string;
   scrambleId: string;
   teamName: string;
   captainName: string;
@@ -14,13 +15,4 @@ export type ScrambleTeam = {
   status: string;
   holesPlayed: number;
   scramble: Scramble;
-};
-
-export type ScrambleTeamCreate = {
-  scrambleId: string;
-  teamName: string;
-  captainName: string;
-  captainEmail: string;
-  startingHole: number;
-  status: string;
 };

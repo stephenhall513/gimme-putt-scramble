@@ -1,4 +1,5 @@
 import { ScrambleEvent } from "@/types/ScrambleEvent";
+import { ScrambleSponsor } from "@/types/ScrambleSponsor";
 import axios from "axios";
 
 export const CreateScrambleEvent = async (data: ScrambleEvent) => {
@@ -27,6 +28,24 @@ export const GetScrambleEvent = async (id: string) => {
 export const GetScrambleEvents = async (golferId: string) => {
   const response = await axios.get<ScrambleEvent[]>(
     process.env.NEXT_PUBLIC_API_URL + "/Event/ScrambleEvents/" + golferId
+  );
+  return response;
+};
+
+export const UploadScrambleEventLogo = async (id: string, file: File) => {
+  const formData = new FormData();
+  formData.append("file", file); // Append the file.
+
+  const response = await axios.post(
+    process.env.NEXT_PUBLIC_API_URL + "/Event/UploadEventLogo/" + id,
+    formData
+  );
+  return response;
+};
+
+export const GetScrambleSponsors = async (id: string) => {
+  const response = await axios.get<ScrambleSponsor[]>(
+    process.env.NEXT_PUBLIC_API_URL + "/Event/ScrambleSponsors/" + id
   );
   return response;
 };
