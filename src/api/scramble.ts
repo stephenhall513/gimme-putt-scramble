@@ -1,5 +1,15 @@
 import { Scorecard } from "@/types/Scorecard";
 import { Scramble } from "@/types/Scramble";
+import {
+  ScrambleCTP,
+  ScrambleCTPAdd,
+  ScrambleCTPUpdate,
+} from "@/types/ScrambleCTP";
+import {
+  ScrambleLongDrive,
+  ScrambleLongDriveAdd,
+  ScrambleLongDriveUpdate,
+} from "@/types/ScrambleLongDrive";
 import { ScrambleSponsor } from "@/types/ScrambleSponsor";
 import { ScrambleTeam, ScrambleTeamCreate } from "@/types/Team";
 import axios from "axios";
@@ -130,6 +140,84 @@ export const GetScrambleScorecard = async (scrambleTeamId: string) => {
     process.env.NEXT_PUBLIC_API_URL +
       "/Scramble/ScrambleScorecard/" +
       scrambleTeamId
+  );
+  return response;
+};
+
+export const GetScrambleCTPs = async (scrambleId: string) => {
+  const response = await axios.get<ScrambleCTP[]>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/CTPs/" + scrambleId
+  );
+  return response;
+};
+
+export const GetScrambleCTP = async (scrambleCTPId: string) => {
+  const response = await axios.get<ScrambleCTP>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/CTP/" + scrambleCTPId
+  );
+  return response;
+};
+
+export const CreateScrambleCTP = async (data: ScrambleCTPAdd) => {
+  const response = await axios.post<string>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/CTP",
+    data
+  );
+  return response;
+};
+
+export const UpdateScrambleCTP = async (data: ScrambleCTPUpdate) => {
+  const response = await axios.put(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/CTP",
+    data
+  );
+  return response;
+};
+
+export const DeleteScrambleCTP = async (id: string) => {
+  const response = await axios.delete<number>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/CTP/" + id
+  );
+  return response;
+};
+
+export const GetScrambleLongDrives = async (scrambleId: string) => {
+  const response = await axios.get<ScrambleLongDrive[]>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/LongDrives/" + scrambleId
+  );
+  return response;
+};
+
+export const GetScrambleLongDrive = async (scrambleLongDriveId: string) => {
+  const response = await axios.get<ScrambleCTP>(
+    process.env.NEXT_PUBLIC_API_URL +
+      "/Scramble/LongDrive/" +
+      scrambleLongDriveId
+  );
+  return response;
+};
+
+export const CreateScrambleLongDrive = async (data: ScrambleLongDriveAdd) => {
+  const response = await axios.post<string>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/LongDrive",
+    data
+  );
+  return response;
+};
+
+export const UpdateScrambleLongDrive = async (
+  data: ScrambleLongDriveUpdate
+) => {
+  const response = await axios.put(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/LongDrive",
+    data
+  );
+  return response;
+};
+
+export const DeleteScrambleLongDrive = async (id: string) => {
+  const response = await axios.delete<number>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/LongDrive/" + id
   );
   return response;
 };

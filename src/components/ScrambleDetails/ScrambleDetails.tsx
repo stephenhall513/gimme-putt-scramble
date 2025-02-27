@@ -1,3 +1,4 @@
+"use client";
 import { GetScramble } from "@/api/scramble";
 import { Scramble } from "@/types/Scramble";
 import { Box, Grid2 } from "@mui/material";

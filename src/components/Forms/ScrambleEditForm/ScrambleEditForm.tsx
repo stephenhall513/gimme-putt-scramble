@@ -39,6 +39,7 @@ import { ClubSearch } from "@/types/ClubSearch";
 import { Club } from "@/types/Club";
 import { TeeBox } from "@/types/TeeBox";
 import ScrambleDetails from "@/components/ScrambleDetails/ScrambleDetails";
+import ScrambleGames from "@/components/ScrambleGames/ScrambleGames";
 
 const scrambleFormSchema = Yup.object({
   scrambleName: Yup.string().required("Scramble Name is required"),
@@ -83,6 +84,7 @@ const ScrambleEditForm = ({
   const [showCourseGrid, setShowCourseGrid] = useState<boolean>(false);
   const [showTeeBoxGrid, setShowTeeBoxGrid] = useState<boolean>(false);
   const [scramble, setScramble] = useState<Scramble>();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 5,
     page: 0,
@@ -146,6 +148,10 @@ const ScrambleEditForm = ({
     formik.setFieldValue("courseName", teeName);
     setShowCourseGrid(true);
     setShowCourseLookup(false);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   const formik = useFormik({
@@ -742,31 +748,21 @@ const ScrambleEditForm = ({
         </div>
       ) : (
         <>
-          <div className="flex flex-row">
-            <div className="flex-2 my-4 mr-4">
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => setIsEdit(true)}
-              >
-                Edit Scramble
-              </Button>
-            </div>
-            {/* <div className="flex-2 my-4">
-              <Link href={`/myevents/events/${scrambleEventId}/scramble/${scrambleId}`}>
+          <div className="h-svh">
+            <div className="flex flex-row">
+              <div className="flex-2 my-4 mr-4">
                 <Button
                   variant="contained"
                   color="primary"
-                  title="Manage Sponsors"
-                  size="medium"
+                  onClick={() => setIsEdit(true)}
                 >
-                  Manage Teams
+                  Edit Scramble
                 </Button>
-              </Link>
-            </div> */}
+              </div>
+            </div>
+            <ScrambleDetails scrambleId={scrambleId} refreshTrigger={false} />
+            <ScrambleGames scrambleId={scrambleId} />
           </div>
-          {/* ScrambleDetails */}
-          <ScrambleDetails scrambleId={scrambleId} refreshTrigger={false} />
         </>
       )}
     </>

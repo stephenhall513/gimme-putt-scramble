@@ -6,6 +6,7 @@ import { useState } from "react";
 import useSWR from "swr";
 import ScrambleLeaderboard from "../ScrambleLeaderboard/ScrambleLeaderboard";
 import { Scramble } from "@/types/Scramble";
+import ScrambleWinners from "../ScrambleWinners/ScrambleWinners";
 
 interface EventLeaderboardsProps {
   scrambleEventId: string;
@@ -23,16 +24,25 @@ const ScrambleEventLeaderboard = ({
   if (!scrambleList) return <div>Loading...</div>;
 
   return (
-    <Grid2 container spacing={2}>
+    <Grid2 container spacing={2} className="flex flex-row justify-center">
       {scrambleList.map((scramble) => (
         <Grid2 size={{ xs: 12, md: 6, lg: 4 }} key={scramble.id}>
           <div
-            className="text-2xl text-center pb-5"
+            className="text-3xl text-center"
+            style={{ fontFamily: "Russo One" }}
+          >
+            Leaderboard
+          </div>
+          <div
+            className="text-2xl text-center pb-2"
             style={{ fontFamily: "Russo One" }}
           >
             {scramble.course?.courseName}
           </div>
-          <ScrambleLeaderboard scrambleId={String(scramble.id)} />
+          <div className="flex flex-col justify-center">
+            <ScrambleWinners scrambleId={String(scramble.id)} />
+            <ScrambleLeaderboard scrambleId={String(scramble.id)} />
+          </div>
         </Grid2>
       ))}
     </Grid2>
