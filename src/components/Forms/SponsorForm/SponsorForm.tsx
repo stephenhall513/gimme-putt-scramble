@@ -103,7 +103,7 @@ const SponsorForm = ({ scrambleEventId, isOpen, close }: SponsorFormProps) => {
       file: null,
     },
     validationSchema: sponsorFormSchema,
-    onSubmit: async (values) => {
+    onSubmit: async (values, { resetForm }) => {
       try {
         if (scrambleId) {
           const scrambleSponsor: ScrambleSponsor = {
@@ -125,9 +125,12 @@ const SponsorForm = ({ scrambleEventId, isOpen, close }: SponsorFormProps) => {
                 formik.values.file
               );
             }
-
+            setScrambleId("");
+            setShowScramble(true);
             toast.success("Sponsor Added");
+
             close();
+            resetForm();
           }
         } else {
           console.log("No ScrambleID");
@@ -172,11 +175,10 @@ const SponsorForm = ({ scrambleEventId, isOpen, close }: SponsorFormProps) => {
                           size="small"
                           value={scrambleId} // ✅ Directly bind `scrambleId` state
                           onChange={(event: SelectChangeEvent) => {
-                            console.log("Selected Scramble ID:", event);
-                            // if (event?.target?.value) {
-                            //   setScrambleId(event.target.value);
-                            // }
-                            //setShowScramble(false);
+                            if (event?.target?.value) {
+                              setScrambleId(event.target.value);
+                            }
+                            setShowScramble(false);
                           }}
                         >
                           <MenuItem value="" disabled>
