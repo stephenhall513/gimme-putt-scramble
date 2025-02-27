@@ -7,6 +7,8 @@ import useSWR from "swr";
 import ScrambleLeaderboard from "../ScrambleLeaderboard/ScrambleLeaderboard";
 import { Scramble } from "@/types/Scramble";
 import ScrambleWinners from "../ScrambleWinners/ScrambleWinners";
+import { ScrambleSponsor } from "@/types/ScrambleSponsor";
+import Image from "next/image";
 
 interface EventLeaderboardsProps {
   scrambleEventId: string;
@@ -17,6 +19,11 @@ const ScrambleEventLeaderboard = ({
 }: EventLeaderboardsProps) => {
   const { data: scrambleList, error: scrambleError } = useSWR<Scramble[]>(
     `${process.env.NEXT_PUBLIC_API_URL}/scramble/GetScrambles/${scrambleEventId}`,
+    fetcher
+  );
+
+  const { data: sponsors, error: sponsorError } = useSWR<ScrambleSponsor[]>(
+    `${process.env.NEXT_PUBLIC_API_URL}/event/ScrambleSponsors/${scrambleEventId}`,
     fetcher
   );
 
@@ -38,6 +45,29 @@ const ScrambleEventLeaderboard = ({
             style={{ fontFamily: "Russo One" }}
           >
             {scramble.course?.courseName}
+          </div>
+          <div>
+            <div className="p-3 text-center flex flex-col">Sponsored By:</div>
+            {sponsors
+              ?.filter((x) => x.sponsorType == "Leaderboard")
+              .map((sponsor: ScrambleSponsor) => {
+                return (
+                  <div className="flex flex-col justify-center">
+                    <div className="flex justify-center">
+                      {sponsor.sponsorImage ? (
+                        <Image
+                          src={sponsor.sponsorImage}
+                          height={250}
+                          width={250}
+                          alt={sponsor.sponsorName}
+                        />
+                      ) : (
+                        false
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
           </div>
           <div className="flex flex-col justify-center">
             <ScrambleWinners scrambleId={String(scramble.id)} />

@@ -322,8 +322,8 @@ const SponsorForm = ({ scrambleEventId, isOpen, close }: SponsorFormProps) => {
                               }}
                             >
                               <MenuItem value="Scramble">Scramble</MenuItem>
-                              <MenuItem value="Leaderbaord">
-                                Leaderbaord
+                              <MenuItem value="Leaderoard">
+                                Leaderboard
                               </MenuItem>
                               <MenuItem value="Beverage">Beverage</MenuItem>
                               <MenuItem value="hole">Hole</MenuItem>
