@@ -1,5 +1,8 @@
 "use client";
-import { CreateScrambleEvent } from "@/api/scrambleEvent";
+import {
+  CreateScrambleEvent,
+  UploadScrambleEventLogo,
+} from "@/api/scrambleEvent";
 import { ScrambleEvent } from "@/types/ScrambleEvent";
 import {
   Button,
@@ -12,6 +15,7 @@ import {
   RadioGroup,
   TextField,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { DatePicker } from "@mui/x-date-pickers";
 import { error } from "console";
 import { getCookie, getCookies } from "cookies-next/client";
@@ -21,6 +25,19 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 
 const signupFormSchema = Yup.object({
   organizationName: Yup.string().required("Company/Organization is required"),
@@ -37,7 +54,7 @@ const signupFormSchema = Yup.object({
 });
 
 interface SignupProps {
-  onSuccess: (id: string) => void;
+  onSuccess: (id: string, mulitpleScrambles: boolean) => void;
 }
 
 const Signup = ({ onSuccess }: SignupProps) => {
@@ -90,6 +107,7 @@ const Signup = ({ onSuccess }: SignupProps) => {
       startDate: "",
       endDate: "",
       multiple: "",
+      file: null,
     },
     validationSchema: signupFormSchema,
     onSubmit: async (values) => {
@@ -112,9 +130,15 @@ const Signup = ({ onSuccess }: SignupProps) => {
       const response = await CreateScrambleEvent(scrambleEvent);
       try {
         if (response.status == 200) {
-          const id = response.data;
+          const scrambleEventId = response.data;
+          if (formik.values.file) {
+            const uploadResponse = await UploadScrambleEventLogo(
+              scrambleEventId,
+              formik.values.file
+            );
+          }
           toast.success("Event Created, Continue to Next Section");
-          onSuccess(id);
+          onSuccess(scrambleEventId, values.multiple == "yes" ? true : false);
         }
       } catch (error) {
         toast.error("There was a Problem Creating Event");
@@ -215,6 +239,27 @@ const Signup = ({ onSuccess }: SignupProps) => {
                     ) : (
                       false
                     )}
+                  </Grid2>
+                  <Grid2>
+                    <Button
+                      component="label"
+                      role={undefined}
+                      variant="contained"
+                      tabIndex={-1}
+                      startIcon={<CloudUploadIcon />}
+                    >
+                      Upload Event Logo
+                      <VisuallyHiddenInput
+                        type="file"
+                        accept="image/*"
+                        onChange={(event) => {
+                          const file = event.currentTarget.files?.[0];
+                          if (file) {
+                            formik.setFieldValue("file", file);
+                          }
+                        }}
+                      />
+                    </Button>
                   </Grid2>
                   <Grid2 size={{ lg: 3, md: 6, sm: 12 }}>
                     <DatePicker

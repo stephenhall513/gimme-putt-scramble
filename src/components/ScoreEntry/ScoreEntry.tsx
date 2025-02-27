@@ -26,7 +26,7 @@ import ScrambleScorecard from "../ScrambleScorecard/ScrambleScorecard";
 import { GetScrambleScorecard, GetScrambleTeam } from "@/api/scramble";
 import { Scorecard } from "@/types/Scorecard";
 import { Coordinates } from "../MapboxComponent/MapboxComponent";
-import Leaderboard from "../Leaderboard/Leaderboard";
+import Leaderboard from "../ScrambleLeaderboard/ScrambleLeaderboard";
 import { ScrambleTeam } from "@/types/Team";
 import HoleSponsor from "../HoleSponsor/HoleSponsor";
 import { ScrambleSponsor } from "@/types/ScrambleSponsor";

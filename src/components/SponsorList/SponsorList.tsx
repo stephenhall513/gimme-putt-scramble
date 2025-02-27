@@ -14,14 +14,17 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import SponsorForm from "../Forms/SponsorForm/SponsorForm";
+import DeleteConfirmation from "../DeleteConfirmation/DeleteConfirmation";
+import useSWR from "swr";
+import { fetcher } from "@/api/fetcher";
+import toast from "react-hot-toast";
+import { DeleteScrambleSponsor } from "@/api/scramble";
 
 interface SponsorListProps {
   scrambleEventId: string;
 }
 
 const SponsorList = ({ scrambleEventId }: SponsorListProps) => {
-  const [sponsors, setSponsors] = useState<ScrambleSponsor[]>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 10,
     page: 0,
@@ -29,6 +32,20 @@ const SponsorList = ({ scrambleEventId }: SponsorListProps) => {
   const [selected, setSelected] = useState<GridRowId>();
   const [isDisabled, setIsDisabled] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
+  const [confirmMessage, setConfirmMessage] = useState<string>("this team");
+
+  const {
+    data: sponsors,
+    error,
+    mutate,
+    isLoading,
+  } = useSWR<ScrambleSponsor[]>(
+    process.env.NEXT_PUBLIC_API_URL +
+      "/event/scramblesponsors/" +
+      scrambleEventId,
+    fetcher
+  );
 
   const handleEvent: GridEventListener<"rowClick"> = (
     params: GridRowParams, // GridRowParams
@@ -43,25 +60,26 @@ const SponsorList = ({ scrambleEventId }: SponsorListProps) => {
     setSelected(params.id);
   };
 
-  useEffect(() => {
-    const getSponsors = async () => {
-      const response = await GetScrambleSponsors(scrambleEventId);
-      if (response.status == 200) {
-        setSponsors(response.data);
-      }
-
-      setIsLoading(false);
-    };
-
-    getSponsors();
-  }, []);
-
   const close = async () => {
-    const response = await GetScrambleSponsors(scrambleEventId);
-    if (response.status == 200) {
-      setSponsors(response.data);
-    }
+    mutate();
     setIsFormOpen(false);
+  };
+
+  const confirmDelete = () => {
+    const selectedSponsor = sponsors?.find((x) => x.id == String(selected));
+    if (selectedSponsor) {
+      setConfirmMessage(selectedSponsor.sponsorName);
+      setIsDeleteOpen(true);
+    }
+  };
+
+  const deleteTeam = async () => {
+    const deleteResponse = await DeleteScrambleSponsor(String(selected));
+    if (deleteResponse.status == 200) {
+      mutate();
+      setIsDeleteOpen(false);
+      toast.success("Sponsor Deleted");
+    }
   };
 
   return (
@@ -87,7 +105,12 @@ const SponsorList = ({ scrambleEventId }: SponsorListProps) => {
               </Button>
             </div>
             <div className="flex-2 my-4 mr-4">
-              <Button variant="contained" color="primary" disabled={isDisabled}>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={isDisabled}
+                onClick={() => confirmDelete()}
+              >
                 Delete Sponsor
               </Button>
             </div>
@@ -158,6 +181,12 @@ const SponsorList = ({ scrambleEventId }: SponsorListProps) => {
             scrambleEventId={scrambleEventId}
             isOpen={isFormOpen}
             close={() => close()}
+          />
+          <DeleteConfirmation
+            isOpen={isDeleteOpen}
+            message={confirmMessage}
+            onClose={() => setIsDeleteOpen(false)}
+            onConfirm={() => deleteTeam()}
           />
         </div>
       ) : (

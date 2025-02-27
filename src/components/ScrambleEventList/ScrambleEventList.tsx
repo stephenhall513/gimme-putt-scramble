@@ -63,7 +63,7 @@ const ScrambleEventList = ({
           <div className="flex-1 w-12 my-4">
             <Button
               variant="contained"
-              color="secondary"
+              color="primary"
               disabled={isDisabled}
               onClick={() => viewDetails()}
             >

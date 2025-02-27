@@ -23,9 +23,11 @@ const SignupPage = () => {
   // );
   const [showEventForm, setShowEventForm] = useState<boolean>(true);
   const [showScrambleForm, setShowScrambleForm] = useState<boolean>(true);
+  const [multiple, setMultiple] = useState<boolean>(false);
 
-  const eventFormComplete = (eventId: string) => {
+  const eventFormComplete = (eventId: string, mulitpleScrambles: boolean) => {
     setScrambleEventId(eventId);
+    setMultiple(mulitpleScrambles);
     setShowEventForm(false);
     setShowScrambleForm(true);
   };
@@ -41,10 +43,15 @@ const SignupPage = () => {
         {scrambleEventId ? (
           <ScrambleForm
             eventId={scrambleEventId}
+            allowMultiple={multiple}
             onSuccess={() => scrambleFormcomplete()}
           />
         ) : (
-          <Signup onSuccess={(id: string) => eventFormComplete(id)} />
+          <Signup
+            onSuccess={(id: string, mulitpleScrambles: boolean) =>
+              eventFormComplete(id, mulitpleScrambles)
+            }
+          />
         )}
       </div>
     </>

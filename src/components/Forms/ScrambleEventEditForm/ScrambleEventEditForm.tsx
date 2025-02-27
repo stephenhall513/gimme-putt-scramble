@@ -493,7 +493,7 @@ const ScrambleEventEditForm = ({
                 Edit Event
               </Button>
             </div>
-            <div className="flex-2 my-4">
+            <div className="flex-2 my-4 mr-4">
               <Link href={`/myevents/events/${scrambleEventId}/sponsors`}>
                 <Button
                   variant="contained"
@@ -502,6 +502,18 @@ const ScrambleEventEditForm = ({
                   size="medium"
                 >
                   Manage Sponsors
+                </Button>
+              </Link>
+            </div>
+            <div className="flex-2 my-4">
+              <Link href={`/myevents/events/${scrambleEventId}/leaderboard`}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  title="View Leaderboard"
+                  size="medium"
+                >
+                  Leaderboard
                 </Button>
               </Link>
             </div>

@@ -23,7 +23,7 @@ const ScrambleTeamUpload = ({
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (!file) {
-      toast("Please select a file.");
+      toast.error("Please select a file.");
       return;
     }
 
@@ -34,15 +34,15 @@ const ScrambleTeamUpload = ({
       if (scrambleId) {
         const response = await UploadScrambleTeams(scrambleId, file);
         if (response.status == 200) {
-          toast("File Successully Processed");
+          toast.success("File Successully Processed");
           close();
         } else {
-          toast("Error uploading file.");
+          toast.error("Error uploading file.");
         }
       }
     } catch (error) {
       console.error("Upload error:", error);
-      toast("Error uploading file.");
+      toast.error("Error uploading file.");
     }
   };
 

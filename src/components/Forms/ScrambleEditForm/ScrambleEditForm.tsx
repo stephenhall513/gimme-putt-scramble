@@ -1,6 +1,11 @@
 "use client";
 import { CreateScrambleEvent } from "@/api/scrambleEvent";
-import { CheckScrambleCode, CreateScramble } from "@/api/scramble";
+import {
+  CheckScrambleCode,
+  CreateScramble,
+  GetScramble,
+  UpdateScramble,
+} from "@/api/scramble";
 import { Scramble } from "@/types/Scramble";
 import {
   Box,
@@ -12,6 +17,7 @@ import {
   Grid2,
   Icon,
   InputLabel,
+  Link,
   MenuItem,
   Modal,
   Radio,
@@ -32,9 +38,13 @@ import { DataGrid } from "@mui/x-data-grid";
 import { ClubSearch } from "@/types/ClubSearch";
 import { Club } from "@/types/Club";
 import { TeeBox } from "@/types/TeeBox";
+import ScrambleDetails from "@/components/ScrambleDetails/ScrambleDetails";
 
 const scrambleFormSchema = Yup.object({
   scrambleName: Yup.string().required("Scramble Name is required"),
+  scrambleCode: Yup.string()
+    .required("Scramble Code is required")
+    .min(6, "Scramble Code must be at least 6 characters"),
   description: Yup.string(),
   scrambleDate: Yup.date().required("Scramble Start Date is required"),
   courseId: Yup.string().required("Please Choose a Course"),
@@ -44,20 +54,18 @@ const scrambleFormSchema = Yup.object({
   ),
 });
 
-interface ScrambleProps {
-  eventId: string;
-  allowMultiple: boolean;
-  onSuccess: () => void;
+interface ScrambleEditProps {
+  scrambleId: string;
+  onSuccess?: () => void;
   onCancel?: () => void;
 }
 
-const ScrambleForm = ({
-  eventId,
-  allowMultiple,
+const ScrambleEditForm = ({
+  scrambleId,
   onSuccess,
   onCancel,
-}: ScrambleProps) => {
-  const [showSignup, setShowSignup] = useState<boolean>(true);
+}: ScrambleEditProps) => {
+  const [isEdit, setIsEdit] = useState<boolean>(false);
   const [isAvailable, setIsAvailable] = useState<boolean>(false);
   const [showCourseLookup, setShowCourseLookup] = useState<boolean>(false);
   const [courseName, setCourseName] = useState<string>("");
@@ -69,67 +77,28 @@ const ScrambleForm = ({
   const [courseList, setCourseList] = useState<Course[]>();
   const [teeBoxList, setTeeBoxList] = useState<TeeBox[]>();
   const [clubList, setClubList] = useState<Club[]>([]);
-  // const [clubList, setClubList] = useState<Club[]>([
-  //   {
-  //     id: "4db5ee58-b771-49a8-9bc4-08dd4cb4c4f7",
-  //     refId: "141520611261288930",
-  //     clubName: "Glenview Municipal Golf Club",
-  //     city: "Cincinnati",
-  //     state: "OH",
-  //     country: "USA",
-  //     address: "10965 Springfield Pike",
-  //     timestampUpdated: new Date(),
-  //     courses: [
-  //       {
-  //         id: "e9a1fe1b-d555-4e72-dffa-08dd4cb4d1f3",
-  //         refId: "01114152100876355642",
-  //         courseName: "West + West",
-  //         numOfHoles: 18,
-  //       },
-  //       {
-  //         id: "15abd82f-d20a-4b2f-dffb-08dd4cb4d1f3",
-  //         refId: "01214152100876355642",
-  //         courseName: "West + South",
-  //         numOfHoles: 18,
-  //       },
-  //     ],
-  //     numOfCourses: 9,
-  //   },
-  // ]);
   const [selectedCourse, setSelectedCourse] = useState<Course>();
   const [selectedClub, setSelectedClub] = useState<Club>();
   const [selectedTeeBox, setSelectedTeeBox] = useState<TeeBox>();
   const [showCourseGrid, setShowCourseGrid] = useState<boolean>(false);
   const [showTeeBoxGrid, setShowTeeBoxGrid] = useState<boolean>(false);
+  const [scramble, setScramble] = useState<Scramble>();
   const [paginationModel, setPaginationModel] = useState({
     pageSize: 5,
     page: 0,
   });
 
   useEffect(() => {
-    const allCookies = getCookies();
-    if (allCookies) {
-      if (Object.keys(allCookies).length == 0) {
-        setShowSignup(false);
-      }
-    }
-  }, []);
+    const getScramble = async () => {
+      const response = await GetScramble(scrambleId);
 
-  // const checkCode = async () => {
-  //   if (formik.values.scrambleCode.length >= 6) {
-  //     const response = await CheckScrambleCode(formik.values.scrambleCode);
-  //     if (response.status == 200) {
-  //       setIsAvailable(false);
-  //       setErrorCode("Scramble Code is not available");
-  //       formik.setFieldError("scrambleCode", "Scramble Code is not available");
-  //     } else {
-  //       setIsAvailable(true);
-  //     }
-  //   } else {
-  //     setIsAvailable(false);
-  //     setErrorCode("Scramble Code must be at least 6 characters long");
-  //   }
-  // };
+      if (response.status == 200) {
+        setScramble(response.data);
+      }
+    };
+
+    getScramble();
+  }, []);
 
   const searchClub = async () => {
     const clubSearch: ClubSearch = {
@@ -181,45 +150,43 @@ const ScrambleForm = ({
 
   const formik = useFormik({
     initialValues: {
-      scrambleName: "",
-      scrambleCode: "",
-      description: "",
-      scrambleDate: new Date(),
-      courseName: "",
-      courseId: "",
-      teeBoxId: "",
-      scrambleLogo: "",
-      startTime: new Date(),
-      numOfHoles: 18,
+      id: scramble?.id,
+      eventId: scramble?.eventId,
+      scrambleName: scramble?.scrambleName,
+      scrambleCode: scramble?.scrambleCode,
+      description: scramble?.description,
+      scrambleDate: scramble?.scrambleDate,
+      startTime: scramble?.startTime,
+      courseId: scramble?.courseId,
+      teeBoxId: scramble?.teeBoxId,
+      scrambleLogo: scramble?.scrambleLogo,
+      numOfHoles: scramble?.numOfHoles,
       submitAction: "",
+      courseName: scramble?.course?.courseName,
     },
     validationSchema: scrambleFormSchema,
     onSubmit: async (values, { resetForm }) => {
       //const response = await CheckScrambleCode(formik.values.scrambleCode);
       //if (response.status != 200) {
-      const scramble: Scramble = {
-        eventId: eventId,
-        scrambleName: values.scrambleName,
-        description: values.description,
-        scrambleCode: values.scrambleCode,
-        scrambleDate: new Date(values.scrambleDate),
-        startTime: new Date(values.startTime),
+      const editScramble: Scramble = {
+        id: scramble?.id,
+        eventId: String(scramble?.eventId),
+        scrambleName: String(values.scrambleName),
+        description: String(values.description),
+        scrambleCode: String(values.scrambleCode),
+        scrambleDate: new Date(String(values.scrambleDate)),
+        startTime: new Date(String(values.startTime)),
         courseId: selectedCourse ? selectedCourse?.id : "",
-        teeBoxId: values.teeBoxId,
-        numOfHoles: values.numOfHoles,
-        scrambleLogo: values.scrambleLogo,
+        teeBoxId: String(values.teeBoxId),
+        numOfHoles: Number(values.numOfHoles),
+        scrambleLogo: String(values.scrambleLogo),
       };
 
-      const response = await CreateScramble(scramble);
+      const response = await UpdateScramble(editScramble);
       try {
         if (response.status == 200) {
-          toast.success("Scramble Created");
-
-          if (formik.values.submitAction === "addAnother") {
-            resetForm(); // Clears the form
-          } else {
-            onSuccess(); // Executes success callback
-          }
+          setIsEdit(false);
+          toast.success("Scramble Updated");
         }
       } catch (error) {
         toast.error("There was a Problem Creating Scramble");
@@ -229,7 +196,7 @@ const ScrambleForm = ({
 
   return (
     <>
-      {showSignup ? (
+      {isEdit ? (
         <div className="p-2">
           <Container className="bg-[#F8F6F5] rounded-md p-4">
             <div className="flex flex-col">
@@ -431,23 +398,6 @@ const ScrambleForm = ({
                   </Grid2>
 
                   <Grid2 size={{ lg: 12, sm: 12 }} className="flex flex-row">
-                    {allowMultiple ? (
-                      <div className="mr-2">
-                        <Button
-                          type="submit"
-                          variant="contained"
-                          color="primary"
-                          size="small"
-                          onClick={() =>
-                            formik.setFieldValue("submitAction", "addAnother")
-                          }
-                        >
-                          Save and Add Another
-                        </Button>
-                      </div>
-                    ) : (
-                      false
-                    )}
                     <div className="mr-2">
                       <Button
                         type="submit"
@@ -467,7 +417,7 @@ const ScrambleForm = ({
                         variant="contained"
                         color="inherit"
                         size="small"
-                        onClick={() => (onCancel ? onCancel() : false)}
+                        onClick={() => setIsEdit(false)}
                       >
                         Cancel
                       </Button>
@@ -791,10 +741,36 @@ const ScrambleForm = ({
           </Modal>
         </div>
       ) : (
-        false
+        <>
+          <div className="flex flex-row">
+            <div className="flex-2 my-4 mr-4">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setIsEdit(true)}
+              >
+                Edit Scramble
+              </Button>
+            </div>
+            {/* <div className="flex-2 my-4">
+              <Link href={`/myevents/events/${scrambleEventId}/scramble/${scrambleId}`}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  title="Manage Sponsors"
+                  size="medium"
+                >
+                  Manage Teams
+                </Button>
+              </Link>
+            </div> */}
+          </div>
+          {/* ScrambleDetails */}
+          <ScrambleDetails scrambleId={scrambleId} refreshTrigger={false} />
+        </>
       )}
     </>
   );
 };
 
-export default ScrambleForm;
+export default ScrambleEditForm;

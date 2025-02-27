@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ScrambleEvent } from "@/types/ScrambleEvent";
 import { GetScrambleEvent } from "@/api/scrambleEvent";
 import { GetScrambles } from "@/api/scramble";
-import { Button } from "@mui/material";
+import { Button, Modal } from "@mui/material";
 import {
   DataGrid,
   GridCallbackDetails,
@@ -15,6 +15,7 @@ import {
 } from "@mui/x-data-grid";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
+import ScrambleForm from "../Forms/ScrambleForm/ScrambleForm";
 
 interface ScrambleListProps {
   scrambleEventId: string;
@@ -31,6 +32,7 @@ const ScrambleList = ({ scrambleEventId }: ScrambleListProps) => {
   });
   const [selected, setSelected] = useState<GridRowId>();
   const [isDisabled, setIsDisabled] = useState(true);
+  const [addOpen, setAddOpen] = useState<boolean>(false);
 
   const handleEvent: GridEventListener<"rowClick"> = (
     params: GridRowParams, // GridRowParams
@@ -43,6 +45,10 @@ const ScrambleList = ({ scrambleEventId }: ScrambleListProps) => {
       setIsDisabled(false);
     }
     setSelected(params.id);
+  };
+
+  const addScrambleClick = () => {
+    setAddOpen(true);
   };
 
   const editScrambleClick = () => {
@@ -79,6 +85,10 @@ const ScrambleList = ({ scrambleEventId }: ScrambleListProps) => {
     getScrambles();
   }, []);
 
+  const scrambleFormcomplete = () => {
+    setAddOpen(false);
+  };
+
   return (
     <>
       {!isLoading ? (
@@ -87,6 +97,29 @@ const ScrambleList = ({ scrambleEventId }: ScrambleListProps) => {
           style={{ width: "100%" }}
         >
           <div className="flex flex-row">
+            {scrambleEvent?.hasMultipleScrambles ? (
+              <>
+                <div className="flex-2 my-4 mr-4">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => addScrambleClick()}
+                  >
+                    Add Scramble
+                  </Button>
+                </div>
+                <Modal open={addOpen} onClose={() => setAddOpen(false)}>
+                  <ScrambleForm
+                    eventId={scrambleEventId}
+                    allowMultiple={scrambleEvent?.hasMultipleScrambles}
+                    onSuccess={() => scrambleFormcomplete()}
+                    onCancel={() => setAddOpen(false)}
+                  />
+                </Modal>
+              </>
+            ) : (
+              false
+            )}
             <div className="flex-2 my-4 mr-4">
               <Button
                 variant="contained"
@@ -118,12 +151,6 @@ const ScrambleList = ({ scrambleEventId }: ScrambleListProps) => {
                 field: "scrambleName",
                 headerName: "Scramble Name",
                 width: 400,
-                hideable: false,
-              },
-              {
-                field: "scrambleCode",
-                headerName: "Code",
-                width: 200,
                 hideable: false,
               },
               {

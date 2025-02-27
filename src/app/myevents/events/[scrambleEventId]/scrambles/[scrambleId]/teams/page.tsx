@@ -29,12 +29,6 @@ export default async function ScrambleTeamsPage({
                 <Typography sx={{ color: "#FFFFFF" }}>Manage Teams</Typography>
               </Breadcrumbs>
               <Container className="bg-[#F8F6F5] rounded-md p-4">
-                <div
-                  className="text-center text-xl pb-6"
-                  style={{ fontFamily: "Russo One" }}
-                >
-                  Scramble Teams Page
-                </div>
                 <ScrambleTeamsList scrambleId={scrambleId} />
               </Container>
             </div>

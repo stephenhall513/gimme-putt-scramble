@@ -12,6 +12,14 @@ export const CreateScramble = async (data: Scramble) => {
   return response;
 };
 
+export const UpdateScramble = async (data: Scramble) => {
+  const response = await axios.put(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/UpdateScramble",
+    data
+  );
+  return response;
+};
+
 export const GetScramble = async (id: string) => {
   const response = await axios.get<Scramble>(
     process.env.NEXT_PUBLIC_API_URL + "/Scramble/GetScramble/" + id
@@ -78,8 +86,8 @@ export const CreateScrambleTeam = async (data: ScrambleTeamCreate) => {
 };
 
 export const DeleteScrambleTeam = async (id: string) => {
-  const response = await axios.post<string>(
-    process.env.NEXT_PUBLIC_API_URL + "/Scramble/CreateScrambleTeam" + id
+  const response = await axios.delete<number>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/DeleteScrambleTeam/" + id
   );
   return response;
 };
@@ -88,6 +96,13 @@ export const CreateScrambleSponsor = async (data: ScrambleSponsor) => {
   const response = await axios.post<string>(
     process.env.NEXT_PUBLIC_API_URL + "/Scramble/CreateSponsor",
     data
+  );
+  return response;
+};
+
+export const DeleteScrambleSponsor = async (id: string) => {
+  const response = await axios.delete<number>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/DeleteScrambleSponsor/" + id
   );
   return response;
 };
