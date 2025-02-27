@@ -52,7 +52,10 @@ const ScrambleEventLeaderboard = ({
               ?.filter((x) => x.sponsorType == "Leaderboard")
               .map((sponsor: ScrambleSponsor) => {
                 return (
-                  <div className="flex flex-col justify-center">
+                  <div
+                    key={sponsor.id}
+                    className="flex flex-col justify-center"
+                  >
                     <div className="flex justify-center">
                       {sponsor.sponsorImage ? (
                         <Image
