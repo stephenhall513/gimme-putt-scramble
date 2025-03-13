@@ -1,6 +1,8 @@
+import ScrambleEventPage from "@/app/myevents/events/[scrambleEventId]/page";
 import ScrambleOverview from "@/components/ScrambleOverview/ScrambleOverview";
 import ScrambleTeamsSelect from "@/components/ScrambleTeamsSelect/ScrambleTeamsSelect";
 import { Container } from "@mui/material";
+import Image from "next/image";
 
 export default async function ScramblePage({
   params,
@@ -32,7 +34,15 @@ export default async function ScramblePage({
 
   return (
     <>
-      <div>
+      <div className="flex flex-col items-center">
+        <div className="">
+          <Image
+            src="/images/GimmePuttLogo2.png"
+            height={150}
+            width={150}
+            alt="Gimme Putt Golf"
+          />
+        </div>
         <div className="py-[15px] md:py-[20px] lg:py-[30px] xl:py-[40px]">
           <div className="container mx-auto">
             <div className="p-2">

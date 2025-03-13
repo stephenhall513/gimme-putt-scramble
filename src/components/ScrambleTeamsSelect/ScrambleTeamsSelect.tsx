@@ -1,9 +1,7 @@
 "use client";
-import { fetcher } from "@/api/fetcher";
 import { ScrambleTeam } from "@/types/Team";
 import { Box, Container, Link, Modal } from "@mui/material";
 import { format } from "date-fns";
-import useSWR from "swr";
 
 interface ScrambleTeamsSelectProps {
   scrambleTeams: ScrambleTeam[];
@@ -29,27 +27,49 @@ const ScrambleTeamsSelect = ({
           justifyContent: "center",
         }}
       >
-        <Box className="max-h-[80vh] overflow-y-auto">
+        <Box className="max-h-[80vh] overflow-y-auto bg-[#F8F6F5] rounded-md h-screen w-[80%]">
           <div className="py-[15px] md:py-[20px] lg:py-[30px] xl:py-[40px]">
             <div className="container mx-auto">
+              {/* <Image
+                src="/images/GimmePuttLogo2.png"
+                height={50}
+                width={50}
+                alt="Gimme Putt Golf"
+              /> */}
+              <div
+                className="text-center text-[11pt] pb-5 w-[90%] mx-auto"
+                style={{ fontFamily: "Russo One" }}
+              >
+                Below are a list of scramble teams that you are associated with.
+              </div>
+              <div
+                className="text-center text-[11pt] pb-4 w-[90%] mx-auto"
+                style={{ fontFamily: "Russo One" }}
+              >
+                Select Team to Enter Event
+              </div>
               <div className="p-2">
                 <Container className="bg-[#F8F6F5] rounded-md">
                   {scrambleTeams?.map((scrambleTeam: ScrambleTeam) => {
                     return (
-                      <div
+                      <Link
                         key={scrambleTeam.id}
-                        className="px-10 even:bg-gray-300"
+                        href={"/scramble/" + scrambleTeam.id}
+                        color="inherit"
+                        underline="none"
                       >
-                        <Link
-                          href={"/scramble/" + scrambleTeam.id}
-                          color="primary"
-                          underline="none"
-                        >
+                        <div className="even:bg-gray-300 border-black border-[1px] p-2 rounded-md">
                           <div
                             className="pt-1 text-md text-center"
                             style={{ fontFamily: "Russo One" }}
                           >
                             {scrambleTeam.teamName}
+                          </div>
+                          <div
+                            className="pt-1 text-sm text-center"
+                            style={{ fontFamily: "Russo One" }}
+                          >
+                            {scrambleTeam.scramble.scrambleName}
                           </div>
                           <div className="text-sm text-center">
                             {scrambleTeam.scramble.course?.courseName}
@@ -60,12 +80,8 @@ const ScrambleTeamsSelect = ({
                               "MM/dd/yyyy"
                             )}
                           </div>
-                        </Link>
-                        {/* <hr
-                          key={`hr-${scrambleTeam.id}`}
-                          className="mt-2 h-px bg-black border-none w-full opacity-100"
-                        /> */}
-                      </div>
+                        </div>
+                      </Link>
                     );
                   })}
                 </Container>

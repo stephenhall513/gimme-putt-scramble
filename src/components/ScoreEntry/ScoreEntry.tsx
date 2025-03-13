@@ -12,6 +12,7 @@ import {
   Card,
   CardContent,
   ButtonGroup,
+  Box,
 } from "@mui/material";
 import { useFormik } from "formik";
 import toast from "react-hot-toast";
@@ -41,6 +42,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
   const [currentHoleNumber, setCurrentHoleNumber] = useState<number>(0);
   const [nextHoleNumber, setNextHoleNumber] = useState<number>(0);
   const [prevHoleNumber, setPrevHoleNumber] = useState<number>(0);
+  const [finishingHoleNumber, setFinishingHoleNumber] = useState<number>(0);
   const [scrambleTeam, setScrambleTeam] = useState<ScrambleTeam>();
   const [bottomPoint, setBottomPoint] = useState<Coordinates>({
     lng: -84.3173979,
@@ -70,6 +72,11 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
       console.log("ScrambleTeam", response);
       if (response.status == 200) {
         setScrambleTeam(response.data);
+        if (response.data.startingHole == 1) {
+          setFinishingHoleNumber(18);
+        } else {
+          setFinishingHoleNumber(response.data.startingHole - 1);
+        }
       }
     };
 
@@ -125,27 +132,40 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
       submitAction: "",
     },
     onSubmit: async (values) => {
-      const scrambleScore: ScrambleScore = {
-        scrambleTeamId: holeInfo?.scrambleTeamId ? holeInfo.scrambleTeamId : "",
-        holeId: holeInfo?.holeId ? holeInfo.holeId : "",
-        scrambleScoreId: holeInfo?.scrambleScoreId,
-        strokes: values.strokes,
-      };
+      if (values.strokes > 0) {
+        const scrambleScore: ScrambleScore = {
+          scrambleTeamId: holeInfo?.scrambleTeamId
+            ? holeInfo.scrambleTeamId
+            : "",
+          holeId: holeInfo?.holeId ? holeInfo.holeId : "",
+          scrambleScoreId: holeInfo?.scrambleScoreId,
+          strokes: values.strokes,
+        };
 
-      try {
-        const response = await AddScores(scrambleScore);
-        if (response.status === 200) {
-          toast.success("Score Saved");
+        try {
+          const response = await AddScores(scrambleScore);
+          if (response.status === 200) {
+            toast.success("Score Saved");
 
-          // Navigate based on the submit action
-          if (values.submitAction === "next") {
-            setCurrentHoleNumber(nextHoleNumber);
-          } else if (values.submitAction === "prev") {
-            setCurrentHoleNumber(prevHoleNumber);
+            // Navigate based on the submit action
+            switch (values.submitAction) {
+              case "end":
+                // Handle end round logic here
+                // For example, you might want to redirect to a summary page or show a message
+                break;
+              case "next":
+                setCurrentHoleNumber(nextHoleNumber);
+                break;
+              case "prev":
+                setCurrentHoleNumber(prevHoleNumber);
+                break;
+            }
           }
+        } catch (error) {
+          toast.error("There was a Problem Saving Score");
         }
-      } catch (error) {
-        toast.error("There was a Problem Saving Score");
+      } else {
+        toast.error("Please enter a score.");
       }
     },
   });
@@ -235,15 +255,29 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                   >
                     <ChevronLeft /> Previous
                   </Button>
-
-                  <Button
-                    type="submit"
-                    variant="text"
-                    color="primary"
-                    onClick={() => formik.setFieldValue("submitAction", "next")}
-                  >
-                    Next <ChevronRight />
-                  </Button>
+                  {finishingHoleNumber === currentHoleNumber ? (
+                    <Button
+                      type="submit"
+                      variant="text"
+                      color="primary"
+                      onClick={() =>
+                        formik.setFieldValue("submitAction", "end")
+                      }
+                    >
+                      End Round
+                    </Button>
+                  ) : (
+                    <Button
+                      type="submit"
+                      variant="text"
+                      color="primary"
+                      onClick={() =>
+                        formik.setFieldValue("submitAction", "next")
+                      }
+                    >
+                      Next <ChevronRight />
+                    </Button>
+                  )}
                 </div>
               </Grid2>
               <Grid2 className="flex flex-row justify-evenly w-full">
@@ -308,6 +342,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                           marginRight: 20,
                           fontWeight: "bold",
                           color: "#000000",
+                          marginBottom: 10,
                         }}
                       >
                         Enter Score for the Hole
@@ -318,14 +353,29 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                         style={{ flexDirection: "row" }}
                         value={formik.values.strokes}
                       >
-                        {[...Array(10)].map((_, i) => (
-                          <FormControlLabel
-                            key={i + 1}
-                            value={(i + 1).toString()}
-                            control={<Radio />}
-                            label={(i + 1).toString()}
-                          />
-                        ))}
+                        <Box
+                          sx={{
+                            display: "grid",
+                            gridTemplateColumns: "repeat(5, 1fr)", // 5 items per row
+                            gap: 2, // Adjust spacing between items
+                            justifyContent: "center",
+                          }}
+                        >
+                          {[...Array(10)].map((_, i) => (
+                            <FormControlLabel
+                              key={i + 1}
+                              value={(i + 1).toString()}
+                              control={<Radio color="primary" />}
+                              label={(i + 1).toString()}
+                              labelPlacement="top"
+                              sx={{
+                                margin: 0,
+                                gap: "2px",
+                                alignItems: "center",
+                              }} // Adjust spacing
+                            />
+                          ))}
+                        </Box>
                       </RadioGroup>
                       {formik.errors.strokes && formik.touched.strokes ? (
                         <div className="text-xs text-red-600">
@@ -367,8 +417,8 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
               false
             )}
             {showScorecard && scorecard ? (
-              <Card className="p-2 max-w-4xl mx-auto mt-5">
-                <CardContent className="overflow=x-auto">
+              <Card className="p-2 max-w-4xl mx-auto mt-5 w-full">
+                <CardContent className="overflow-x-auto">
                   <ScrambleScorecard scorecard={scorecard} />
                 </CardContent>
               </Card>

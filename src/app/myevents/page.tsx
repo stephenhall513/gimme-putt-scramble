@@ -8,7 +8,7 @@ import Loader from "@/components/Loader";
 import { Container } from "@mui/material";
 import { useRouter } from "next/navigation";
 
-const MyEventsPage = () => {
+export default function MyEventsPage() {
   const router = useRouter();
   const [scrambleEvents, setScrambleEvents] = useState<ScrambleEvent[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -60,6 +60,4 @@ const MyEventsPage = () => {
       )}
     </>
   );
-};
-
-export default MyEventsPage;
+}

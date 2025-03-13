@@ -2,6 +2,8 @@ import ScoreEntry from "@/components/ScoreEntry/ScoreEntry";
 import { AppBar, Container, Toolbar } from "@mui/material";
 import Link from "next/link";
 import Image from "next/image";
+import Sponsor from "@/components/Sponsor/Sponsor";
+import HoleSponsor from "@/components/HoleSponsor/HoleSponsor";
 
 export default async function ScoringPage({
   params,
