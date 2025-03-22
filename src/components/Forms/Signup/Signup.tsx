@@ -240,27 +240,6 @@ const Signup = ({ onSuccess }: SignupProps) => {
                       false
                     )}
                   </Grid2>
-                  <Grid2>
-                    <Button
-                      component="label"
-                      role={undefined}
-                      variant="contained"
-                      tabIndex={-1}
-                      startIcon={<CloudUploadIcon />}
-                    >
-                      Upload Event Logo
-                      <VisuallyHiddenInput
-                        type="file"
-                        accept="image/*"
-                        onChange={(event) => {
-                          const file = event.currentTarget.files?.[0];
-                          if (file) {
-                            formik.setFieldValue("file", file);
-                          }
-                        }}
-                      />
-                    </Button>
-                  </Grid2>
                   <Grid2 size={{ lg: 3, md: 6, sm: 12 }}>
                     <DatePicker
                       name="startDate"
@@ -303,7 +282,7 @@ const Signup = ({ onSuccess }: SignupProps) => {
                       name="description"
                       type="text"
                       multiline={true}
-                      label="Event Description"
+                      label="Event Description (optional)"
                       rows={4}
                       size="small"
                       variant="outlined"
@@ -431,6 +410,47 @@ const Signup = ({ onSuccess }: SignupProps) => {
                         false
                       )}
                     </FormControl>
+                  </Grid2>
+                  <Grid2 size={{ md: 12, sm: 12 }}>
+                    {formik.values.multiple == "yes" ? (
+                      <div className="flex flex-row">
+                        <Button
+                          component="label"
+                          role={undefined}
+                          variant="contained"
+                          tabIndex={-1}
+                          startIcon={<CloudUploadIcon />}
+                        >
+                          Upload Event Logo
+                          <VisuallyHiddenInput
+                            type="file"
+                            accept="image/*"
+                            onChange={(event) => {
+                              const file = event.currentTarget.files?.[0];
+                              if (file) {
+                                formik.setFieldValue("file", file);
+                              }
+                            }}
+                          />
+                        </Button>
+                        {formik.values.file ? (
+                          <div className="text-black pl-4">
+                            {formik.values.file
+                              ? (formik.values.file as File).name
+                              : ""}
+                          </div>
+                        ) : (
+                          false
+                        )}
+                        <div className="text-sm text-gray-500 pl-2">
+                          Please upload a logo for your event. <br />
+                          This will be used on the event page and event
+                          leaderboard when you have multiple scrambles.
+                        </div>
+                      </div>
+                    ) : (
+                      false
+                    )}
                   </Grid2>
                   <Grid2 size={{ lg: 12, sm: 12 }}>
                     <Button

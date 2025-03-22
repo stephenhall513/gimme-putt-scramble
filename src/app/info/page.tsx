@@ -1,3 +1,4 @@
+import SiteHeader from "@/components/SiteHeader/SiteHeader";
 import { Button, Container } from "@mui/material";
 import Link from "next/link";
 
@@ -5,6 +6,7 @@ const InfoPage = () => {
   return (
     <>
       <div>
+        <SiteHeader />
         <Container className="bg-[#F8F6F5] rounded-md p-4">
           <div
             className="text-center text-xl pb-6"

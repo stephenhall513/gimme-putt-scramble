@@ -212,7 +212,6 @@ const ScrambleEditForm = ({
               >
                 Tell us about the details of your scramble
               </div>
-              <div>{formik.errors.teeBoxId}</div>
               <form onSubmit={formik.handleSubmit}>
                 <Grid2 container spacing={1}>
                   <Grid2 size={{ md: 4, sm: 12 }}>
