@@ -15,7 +15,11 @@ const InfoPage = () => {
             Looking to Host a Golf Scramble? Look No Further!
           </div>
           <div className="text-center pb-6">
-            <Link href="/signup">
+            <Link
+              href="https://gimmeputtgolf.com/signup"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Button
                 variant="contained"
                 color="primary"
@@ -107,7 +111,7 @@ const InfoPage = () => {
             hosting a golf scramble can be!
           </div>
           <div className="text-center pt-6">
-            <Link href="/signup">
+            <Link href="https://gimmeputtgolf.com/signup">
               <Button
                 variant="contained"
                 color="primary"

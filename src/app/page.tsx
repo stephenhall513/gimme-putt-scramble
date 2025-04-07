@@ -24,12 +24,12 @@ export default function Home() {
             <span className="underline">Click Here</span>
           </Link>
         </div>
-        <div className="text-center text-black pb-4 text-sm">
+        {/* <div className="text-center text-black pb-4 text-sm">
           <Link href="/login" title="Interested in Setting Up a Scramble?">
             Event Organizers <span className="underline">Click Here</span> to
             Sign In
           </Link>
-        </div>
+        </div> */}
       </Container>
     </div>
   );
