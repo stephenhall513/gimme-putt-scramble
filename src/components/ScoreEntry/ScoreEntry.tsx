@@ -45,7 +45,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showMap, setShowMap] = useState<boolean>(false);
   const [holeInfo, setHoleInfo] = useState<ScrambleScore>();
-  const [currentHoleNumber, setCurrentHoleNumber] = useState<number>(0);
+  const [currentHoleNumber, setCurrentHoleNumber] = useState<number>(1);
   const [nextHoleNumber, setNextHoleNumber] = useState<number>(0);
   const [prevHoleNumber, setPrevHoleNumber] = useState<number>(0);
   const [finishingHoleNumber, setFinishingHoleNumber] = useState<number>(0);
@@ -81,7 +81,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
       console.log("ScrambleTeam", response);
       if (response.status == 200) {
         setScrambleTeam(response.data);
-
+        setCurrentHoleNumber(response.data.currentHole);
         if (response.data.holesPlayed == response.data.scramble.numOfHoles) {
           setShowEndRound(true);
         }
@@ -91,8 +91,6 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
           setFinishingHoleNumber(response.data.startingHole - 1);
         }
       }
-
-      setIsLoading(false);
     };
 
     const getHoleInfo = async () => {
@@ -132,11 +130,13 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
 
         setHoleInfo(response.data);
       }
+
+      setIsLoading(false);
     };
 
     getScorecard();
-    getHoleInfo();
     getTeam();
+    getHoleInfo();
   }, [currentHoleNumber, scrambleTeamId]);
 
   const formik = useFormik({
