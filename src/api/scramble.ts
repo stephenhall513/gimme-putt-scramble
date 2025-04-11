@@ -54,7 +54,7 @@ export const CheckScrambleCode = async (id: string) => {
 export const CheckScrambleEmail = async (email: string) => {
   const response = await axios.post<ScrambleTeam[]>(
     process.env.NEXT_PUBLIC_API_URL + "/Scramble/CheckScrambleEmail",
-    email
+    { email }
   );
   return response;
 };
