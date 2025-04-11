@@ -64,6 +64,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
   const [showScorecard, setShowScorecard] = useState<boolean>(false);
   const [showScoring, setShowScoring] = useState<boolean>(true);
   const [showEndRound, setShowEndRound] = useState<boolean>(false);
+  const [hasCoordinates, setHasCoordinates] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -102,7 +103,8 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
       if (response.status === 200) {
         const hole = response.data.hole;
 
-        if (hole?.coordinates) {
+        if (hole?.coordinates && hole.coordinates.length > 0) {
+          setHasCoordinates(true);
           const teeboxPoint = hole.coordinates.filter((x) => x.poi == 11)[0];
           const greenPoint = hole.coordinates.filter(
             (x) => x.poi == 1 && x.location == 3
@@ -342,16 +344,20 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                     >
                       Scorecard
                     </Button>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      color={showMap ? "primary" : "secondary"}
-                      style={{ fontSize: "8pt" }}
-                      onClick={() => viewMap()}
-                    >
-                      Map
-                      {/* {showMap ? "Close Map" : "Show Map"} */}
-                    </Button>
+                    {hasCoordinates ? (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        color={showMap ? "primary" : "secondary"}
+                        style={{ fontSize: "8pt" }}
+                        onClick={() => viewMap()}
+                      >
+                        Map
+                        {/* {showMap ? "Close Map" : "Show Map"} */}
+                      </Button>
+                    ) : (
+                      false
+                    )}
                     <Button
                       variant="contained"
                       size="small"
@@ -468,14 +474,18 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                 false
               )}
             </Grid2>
-            {showMap ? (
-              <div key={"hole-" + showMap} className="mx-auto h-svh pt-5">
-                <HoleMap
-                  key={Date.now()}
-                  point1={bottomPoint}
-                  point2={topPoint}
-                />
-              </div>
+            {hasCoordinates ? (
+              showMap ? (
+                <div key={"hole-" + showMap} className="mx-auto h-svh pt-5">
+                  <HoleMap
+                    key={Date.now()}
+                    point1={bottomPoint}
+                    point2={topPoint}
+                  />
+                </div>
+              ) : (
+                false
+              )
             ) : (
               false
             )}
