@@ -19,7 +19,6 @@ import toast from "react-hot-toast";
 import HoleMap from "../HoleMap";
 import ChevronLeft from "@mui/icons-material/ChevronLeft";
 import ChevronRight from "@mui/icons-material/ChevronRight";
-import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import { useEffect, useState } from "react";
 import HoleInfo from "../HoleInfo";
 import Loader from "../Loader";
@@ -168,7 +167,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
             // Navigate based on the submit action
             switch (values.submitAction) {
               case "end":
-                var endResponse = await ScrambleTeamEnd(scrambleTeamId);
+                const endResponse = await ScrambleTeamEnd(scrambleTeamId);
                 if (endResponse.status == 200) {
                   router.push("/scoring/" + scrambleTeamId + "/summary");
                 }
@@ -208,7 +207,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
         strokes: holeInfo.strokes,
       }));
     }
-  }, [holeInfo]);
+  }, [holeInfo, formik]);
 
   const viewScoring = async () => {
     if (showScoring) {

@@ -186,6 +186,8 @@ const ScrambleEditForm = ({
         teeBoxId: String(values.teeBoxId),
         numOfHoles: Number(values.numOfHoles),
         scrambleLogo: String(values.scrambleLogo),
+        rules: "",
+        endMessage: "",
       };
 
       const response = await UpdateScramble(editScramble);
