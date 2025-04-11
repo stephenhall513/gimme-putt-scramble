@@ -1,7 +1,5 @@
 "use client";
-import ScrambleCode from "@/components/Forms/ScrambleCode/ScrambleCode";
 import ScrambleEntry from "@/components/Forms/ScrambleEntry/ScrambleEntry";
-import ScrambleTeamsSelect from "@/components/ScrambleTeamsSelect/ScrambleTeamsSelect";
 import SiteHeader from "@/components/SiteHeader/SiteHeader";
 import { Container } from "@mui/material";
 import Link from "next/link";

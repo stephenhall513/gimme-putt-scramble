@@ -27,78 +27,44 @@ const Leaderboard = ({ scrambleId }: LeaderboardProp) => {
   }
 
   return (
-    <div className="max-w-screen">
-      <Box>
-        <DataGrid
-          hideFooterSelectedRowCount
-          disableColumnFilter
-          disableColumnMenu
-          disableColumnSorting
-          disableColumnResize
-          getRowId={getRowId}
-          columns={[
-            {
-              field: "rank",
-              headerName: "",
-              width: 50,
-            },
-            {
-              field: "teamName",
-              headerName: "Team",
-              width: 150,
-            },
-            {
-              field: "score",
-              headerName: "+/-",
-              align: "center",
-              headerAlign: "center",
-              width: 75,
-            },
-            // {
-            //   field: "grossScore",
-            //   headerName: "Gross",
-            //   align: "center",
-            //   headerAlign: "center",
-            //   width: 100,
-            // },
-            {
-              field: "currentHole",
-              headerName: "Thru",
-              align: "center",
-              headerAlign: "center",
-              width: 75,
-            },
-            {
-              field: "holesPlayed",
-              headerName: "Holes Played",
-              align: "center",
-              headerAlign: "center",
-              width: 125,
-            },
-          ]}
-          rows={data}
-          rowHeight={40}
-          paginationModel={paginationModel}
-          onPaginationModelChange={setPaginationModel}
-          pagination // Enables pagination controls
-          sx={{
-            boxShadow: 1,
-            border: 1,
-            borderColor: "#000000",
-            "& .MuiDataGrid-cell:hover": {
-              color: "#a2a2a2",
-            },
-            "& .MuiDataGrid-container--top": {
-              background: "#2E4706 !important",
-            },
-            "& .MuiDataGrid-columnHeaders, & .MuiDataGrid-columnHeaders *": {
-              background: "#2E4706", // Dark green background
-              color: "#FFFFFF", // Ensuring text color is white
-            },
-          }}
-        />
-      </Box>
-    </div>
+    <table className="border-collapse border border-gray-300 w-[525px]">
+      <thead>
+        <tr className="bg-gray-100 text-xs">
+          <th className="border border-gray-300 p-2 bg-gray"></th>
+          <th className="border border-gray-300 p-2 bg-gray w-[175px]">Team</th>
+          <th className="border border-gray-300 p-2 bg-gray">+/-</th>
+          <th className="border border-gray-300 p-2 bg-gray">Thru</th>
+          <th className="border border-gray-300 p-2 bg-gray text-wrap">
+            Holes Played
+          </th>
+        </tr>
+      </thead>
+      <tbody className="bg-white  text-xs">
+        {data?.map((team, index) => {
+          return (
+            <tr key={team.scrambleTeamId}>
+              <td className="border border-gray-300 p-2 text-center">
+                {team.rank}
+              </td>
+              <td className="border border-gray-300 p-2">{team.teamName}</td>
+              <td className="border border-gray-300 p-2 text-center">
+                {team.score == 0
+                  ? "E"
+                  : team.score > 0
+                    ? "+" + team.score
+                    : team.score}
+              </td>
+              <td className="border border-gray-300 p-2 text-center">
+                {team.currentHole}
+              </td>
+              <td className="border border-gray-300 p-2 text-center">
+                {team.holesPlayed}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 };
 

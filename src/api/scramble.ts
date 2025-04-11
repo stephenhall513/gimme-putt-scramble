@@ -102,6 +102,13 @@ export const DeleteScrambleTeam = async (id: string) => {
   return response;
 };
 
+export const ScrambleTeamEnd = async (id: string) => {
+  const response = await axios.post<number>(
+    process.env.NEXT_PUBLIC_API_URL + "/Scramble/EndScrambleTeam/" + id
+  );
+  return response;
+};
+
 export const CreateScrambleSponsor = async (data: ScrambleSponsor) => {
   const response = await axios.post<string>(
     process.env.NEXT_PUBLIC_API_URL + "/Scramble/CreateSponsor",

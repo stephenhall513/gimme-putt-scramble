@@ -208,6 +208,8 @@ const ScrambleForm = ({
         teeBoxId: values.teeBoxId,
         numOfHoles: values.numOfHoles,
         scrambleLogo: values.scrambleLogo,
+        rules: "",
+        endMessage: "",
       };
 
       const response = await CreateScramble(scramble);

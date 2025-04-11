@@ -24,7 +24,7 @@ const MapBoxComponent: React.FC<MapBoxComponentProps> = ({
     if (mapContainer.current) {
       const map = new mapboxgl.Map({
         container: mapContainer.current,
-        style: "mapbox://styles/altabos/cm2pfh250002901ntbr6v1agh",
+        style: "mapbox://styles/altabos/cm8p3rnb3009401sd5nue3u0i",
         center: [(point1.lng + point2.lng) / 2, (point1.lat + point2.lat) / 2],
         zoom: 16.5,
       });

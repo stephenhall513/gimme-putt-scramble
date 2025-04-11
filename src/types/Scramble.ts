@@ -6,6 +6,8 @@ export type Scramble = {
   scrambleCode: string;
   scrambleName: string;
   description: string;
+  rules: string;
+  endMessage: string;
   scrambleDate: Date;
   startTime: Date;
   courseId: string;

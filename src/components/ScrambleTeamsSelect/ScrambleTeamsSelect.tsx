@@ -58,7 +58,7 @@ const ScrambleTeamsSelect = ({
                         color="inherit"
                         underline="none"
                       >
-                        <div className="even:bg-gray-300 border-black border-[1px] p-2 rounded-md">
+                        <div className="even:bg-gray-300 border-black border-[1px] p-2 rounded-md mb-4">
                           <div
                             className="pt-1 text-md text-center"
                             style={{ fontFamily: "Russo One" }}

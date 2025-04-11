@@ -11,7 +11,7 @@ const ScrambleScorecard = ({ scorecard }: ScorecardProps) => {
     <table className="w-max border-collapse border border-gray-300">
       <thead>
         <tr className="bg-gray-100">
-          <th className="border border-gray-300 p-2"></th>
+          <th className="border border-gray-300 p-2 bg-gray"></th>
           {scorecard?.front9Scores.map((scorecard) => (
             <th
               key={scorecard.hole?.id}
@@ -58,7 +58,7 @@ const ScrambleScorecard = ({ scorecard }: ScorecardProps) => {
             {scorecard.back9Par}
           </th>
           <th className="border border-gray-300 p-2 text-center">
-            {scorecard.totalPar}
+            {scorecard.front9Par + scorecard.back9Par}
           </th>
           <th className="border border-gray-300 p-2 text-center"></th>
         </tr>

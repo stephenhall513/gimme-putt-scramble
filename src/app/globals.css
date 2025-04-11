@@ -51,3 +51,11 @@ body {
 .mapboxgl-ctrl-bottom-right {
   max-height: 0px;
 }
+
+ol,
+ul,
+menu {
+  list-style: disc !important;
+  margin: 10px 10px;
+  padding: 0px 20px;
+}

@@ -38,31 +38,55 @@ const ScrambleOverview = ({ scrambleTeamId }: ScrambleOverviewProps) => {
       {scrambleTeam ? (
         <div>
           <div
-            className="text-center text-black text-xl pb-6"
+            className="text-center text-black text-xl pb-3"
             style={{ fontFamily: "Russo One", fontSize: 24 }}
           >
             {scrambleTeam.scramble.scrambleName}
           </div>
           <div
-            className="text-center text-xl"
+            className="text-center text-md"
             style={{ fontFamily: "Russo One" }}
           >
             {format(scrambleTeam.scramble.scrambleDate, "MM/dd/yyyy")}
           </div>
           <div
-            className="text-center text-lg"
+            className="text-center text-md mb-6"
             style={{ fontFamily: "Russo One" }}
           >
             Shotgun Start:{" "}
             {formatDate(scrambleTeam.scramble.startTime, "h:mm a")}
           </div>
-          <div
-            className="text-center text-lg"
-            style={{ fontFamily: "Russo One" }}
-          >
-            Starting Hole: {scrambleTeam.startingHole}
+          <div className="text-center text-lg font-bold">
+            Welcome,{" "}
+            {scrambleTeam.captainName ? scrambleTeam.captainName : "Guest"}!
           </div>
-          <div className="py-4">{scrambleTeam.scramble.description}</div>
+
+          <div className="text-center text-lg">
+            You will be starting on Hole #{scrambleTeam.startingHole}
+          </div>
+          <div className="py-4 text-sm">
+            <div
+              dangerouslySetInnerHTML={{
+                __html: scrambleTeam.scramble.description,
+              }}
+            />
+          </div>
+          <div className="flex justify-center">
+            <Button
+              variant="contained"
+              color="primary"
+              size="medium"
+              href={"/scoring/" + scrambleTeamId}
+            >
+              Start Scramble
+            </Button>
+          </div>
+          <div className="pt-4 text-md text-left font-bold">Rules:</div>
+          <div className="py-2 text-sm text-left">
+            <div
+              dangerouslySetInnerHTML={{ __html: scrambleTeam.scramble.rules }}
+            />
+          </div>
           <div className="flex justify-center">
             <Button
               variant="contained"

@@ -27,7 +27,7 @@ const ScrambleEntry = () => {
     if (data.length > 0) {
       setIsOpen(true);
     } else {
-      router.push("/scramble/" + data[0].id);
+      toast.error("No Scramble Teams Found.");
     }
   };
 
@@ -76,6 +76,7 @@ const ScrambleEntry = () => {
                     {errors.email}
                   </div>
                 )}
+                {}
                 <div>
                   <Button
                     type="submit"

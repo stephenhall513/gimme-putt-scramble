@@ -24,19 +24,26 @@ import { useEffect, useState } from "react";
 import HoleInfo from "../HoleInfo";
 import Loader from "../Loader";
 import ScrambleScorecard from "../ScrambleScorecard/ScrambleScorecard";
-import { GetScrambleScorecard, GetScrambleTeam } from "@/api/scramble";
+import {
+  GetScrambleScorecard,
+  GetScrambleTeam,
+  ScrambleTeamEnd,
+} from "@/api/scramble";
 import { Scorecard } from "@/types/Scorecard";
 import { Coordinates } from "../MapboxComponent/MapboxComponent";
 import Leaderboard from "../ScrambleLeaderboard/ScrambleLeaderboard";
 import { ScrambleTeam } from "@/types/Team";
 import HoleSponsor from "../HoleSponsor/HoleSponsor";
 import { ScrambleSponsor } from "@/types/ScrambleSponsor";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface ScoreEntryProps {
   scrambleTeamId: string;
 }
 
 const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showMap, setShowMap] = useState<boolean>(false);
   const [holeInfo, setHoleInfo] = useState<ScrambleScore>();
   const [currentHoleNumber, setCurrentHoleNumber] = useState<number>(0);
@@ -57,6 +64,9 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
   const [showScorecard, setShowScorecard] = useState<boolean>(false);
   const [showScoring, setShowScoring] = useState<boolean>(true);
+  const [showEndRound, setShowEndRound] = useState<boolean>(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const getScorecard = async () => {
@@ -72,12 +82,18 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
       console.log("ScrambleTeam", response);
       if (response.status == 200) {
         setScrambleTeam(response.data);
+
+        if (response.data.holesPlayed == response.data.scramble.numOfHoles) {
+          setShowEndRound(true);
+        }
         if (response.data.startingHole == 1) {
           setFinishingHoleNumber(18);
         } else {
           setFinishingHoleNumber(response.data.startingHole - 1);
         }
       }
+
+      setIsLoading(false);
     };
 
     const getHoleInfo = async () => {
@@ -145,13 +161,17 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
         try {
           const response = await AddScores(scrambleScore);
           if (response.status === 200) {
-            toast.success("Score Saved");
+            if (holeInfo?.strokes != values.strokes) {
+              toast.success("Score Saved");
+            }
 
             // Navigate based on the submit action
             switch (values.submitAction) {
               case "end":
-                // Handle end round logic here
-                // For example, you might want to redirect to a summary page or show a message
+                var endResponse = await ScrambleTeamEnd(scrambleTeamId);
+                if (endResponse.status == 200) {
+                  router.push("/scoring/" + scrambleTeamId + "/summary");
+                }
                 break;
               case "next":
                 setCurrentHoleNumber(nextHoleNumber);
@@ -165,7 +185,17 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
           toast.error("There was a Problem Saving Score");
         }
       } else {
-        toast.error("Please enter a score.");
+        switch (values.submitAction) {
+          case "end":
+            toast.error("Please enter a score.");
+            break;
+          case "next":
+            toast.error("Please enter a score.");
+            break;
+          case "prev":
+            setCurrentHoleNumber(prevHoleNumber);
+            break;
+        }
       }
     },
   });
@@ -238,10 +268,22 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
 
   return (
     <>
-      {!holeInfo ? (
+      {isLoading ? (
         <Loader />
-      ) : (
-        <div className="h-full flex flex-col">
+      ) : holeInfo ? (
+        <div className="h-full flex flex-col items-center">
+          {scrambleTeam?.scramble.scrambleLogo ? (
+            <Image
+              src={scrambleTeam.scramble.scrambleLogo}
+              alt={scrambleTeam?.scramble.scrambleName}
+              height={100}
+              width={100}
+            />
+          ) : (
+            <div className="text-2xl text-center font-bold text-black mb-2">
+              {scrambleTeam?.scramble.scrambleName}
+            </div>
+          )}
           <form onSubmit={formik.handleSubmit}>
             {holeInfo.hole ? <HoleInfo hole={holeInfo.hole} /> : false}
             <Grid2 container rowSpacing={2}>
@@ -255,11 +297,11 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                   >
                     <ChevronLeft /> Previous
                   </Button>
-                  {finishingHoleNumber === currentHoleNumber ? (
+                  {showEndRound ? (
                     <Button
                       type="submit"
-                      variant="text"
-                      color="primary"
+                      variant="contained"
+                      color="error"
                       onClick={() =>
                         formik.setFieldValue("submitAction", "end")
                       }
@@ -365,14 +407,43 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                             <FormControlLabel
                               key={i + 1}
                               value={(i + 1).toString()}
-                              control={<Radio color="primary" />}
-                              label={(i + 1).toString()}
-                              labelPlacement="top"
+                              control={
+                                <Radio
+                                  color="primary"
+                                  sx={{
+                                    color: "#FFFFFF",
+                                    "&.Mui-checked": {
+                                      color: "#7DB534", // color of the Radio button when selected
+                                      backgroundColor: "#7DB534", // background color when selected
+                                    },
+                                    width: 40,
+                                    height: 40,
+                                    border: 1,
+                                    borderColor: "#000000",
+                                    borderStyle: "solid",
+                                    backgroundColor: "#FFFFFF",
+                                    // "&:hover": {
+                                    //   backgroundColor: "rgba(0, 0, 0, 0.04)", // optional: hover state
+                                    // },
+                                    "&::before": {
+                                      content: `"${i + 1}"`, // Display number inside the radio
+                                      position: "absolute",
+                                      top: "50%",
+                                      left: "50%",
+                                      transform: "translate(-50%, -50%)",
+                                      color: "#000000", // Text color
+                                      fontSize: "18px", // Adjust size as needed
+                                      zIndex: 1,
+                                    },
+                                  }}
+                                />
+                              }
+                              label="" // Hide default label
                               sx={{
                                 margin: 0,
                                 gap: "2px",
                                 alignItems: "center",
-                              }} // Adjust spacing
+                              }}
                             />
                           ))}
                         </Box>
@@ -410,9 +481,11 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
               false
             )}
             {showLeaderboard && scrambleTeam ? (
-              <div className="pt-5">
-                <Leaderboard scrambleId={scrambleTeam?.scrambleId} />
-              </div>
+              <Card className="p-2 max-w-4xl mx-auto mt-5 w-full">
+                <CardContent className="overflow-x-auto">
+                  <Leaderboard scrambleId={scrambleTeam?.scrambleId} />
+                </CardContent>
+              </Card>
             ) : (
               false
             )}
@@ -427,6 +500,8 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
             )}
           </form>
         </div>
+      ) : (
+        false
       )}
     </>
   );
