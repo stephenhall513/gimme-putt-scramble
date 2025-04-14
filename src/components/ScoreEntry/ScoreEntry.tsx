@@ -209,7 +209,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
         strokes: holeInfo.strokes,
       }));
     }
-  }, [holeInfo, formik]);
+  }, [holeInfo]);
 
   const viewScoring = async () => {
     if (showScoring) {
@@ -272,14 +272,16 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
       {isLoading ? (
         <Loader />
       ) : holeInfo ? (
-        <div className="h-full flex flex-col items-center">
+        <div className="h-full flex flex-col">
           {scrambleTeam?.scramble.scrambleLogo ? (
-            <Image
-              src={scrambleTeam.scramble.scrambleLogo}
-              alt={scrambleTeam?.scramble.scrambleName}
-              height={100}
-              width={100}
-            />
+            <div className="flex justify-center mb-2">
+              <Image
+                src={scrambleTeam.scramble.scrambleLogo}
+                alt={scrambleTeam?.scramble.scrambleName}
+                height={150}
+                width={150}
+              />
+            </div>
           ) : (
             <div className="text-2xl text-center font-bold text-black mb-2">
               {scrambleTeam?.scramble.scrambleName}
@@ -490,7 +492,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
               false
             )}
             {showLeaderboard && scrambleTeam ? (
-              <Card className="p-2 max-w-4xl mx-auto mt-5 w-full">
+              <Card className="p-2 max-w-4xl mx-auto mt-5">
                 <CardContent className="overflow-x-auto">
                   <Leaderboard scrambleId={scrambleTeam?.scrambleId} />
                 </CardContent>
@@ -499,7 +501,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
               false
             )}
             {showScorecard && scorecard ? (
-              <Card className="p-2 max-w-4xl mx-auto mt-5 w-full">
+              <Card className="p-2 max-w-4xl mx-auto mt-5">
                 <CardContent className="overflow-x-auto">
                   <ScrambleScorecard scorecard={scorecard} />
                 </CardContent>
