@@ -10,4 +10,5 @@ export type ScrambleScore = {
   hole?: Hole;
   coordinates?: HoleCoordinate[];
   sponsors?: ScrambleSponsor[];
+  gameType?: string;
 };

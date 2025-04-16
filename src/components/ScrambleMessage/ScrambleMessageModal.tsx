@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { useEffect } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import { format } from "date-fns";
 
 export default function ScrambleMessageModal({
   open,
@@ -57,13 +58,13 @@ export default function ScrambleMessageModal({
                 secondary={
                   <>
                     <Typography component="span">{msg.body}</Typography>
-                    <Typography
+                    {/* <Typography
                       variant="caption"
                       color="textSecondary"
                       display="block"
                     >
-                      {new Date(msg.createdAt).toLocaleString()}
-                    </Typography>
+                      {format(new Date(msg.createdAt), "MM/dd/yyyy hh:mm aa")}
+                    </Typography> */}
                   </>
                 }
               />

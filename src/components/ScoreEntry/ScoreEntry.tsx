@@ -102,7 +102,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
 
       if (response.status === 200) {
         const hole = response.data.hole;
-
+        console.log("gameType", response.data);
         if (hole?.coordinates && hole.coordinates.length > 0) {
           setHasCoordinates(true);
           const teeboxPoint = hole.coordinates.filter((x) => x.poi == 11)[0];
@@ -324,6 +324,15 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                     </Button>
                   )}
                 </div>
+              </Grid2>
+              <Grid2 className="flex flex-row justify-evenly w-full">
+                {holeInfo.gameType ? (
+                  <div className="font-bold text-red-700">
+                    {holeInfo.gameType}
+                  </div>
+                ) : (
+                  false
+                )}
               </Grid2>
               <Grid2 className="flex flex-row justify-evenly w-full">
                 <div>
