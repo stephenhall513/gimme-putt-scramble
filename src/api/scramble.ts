@@ -228,3 +228,26 @@ export const DeleteScrambleLongDrive = async (id: string) => {
   );
   return response;
 };
+
+export const MarkScrambleMessageRead = async (
+  scrambleTeamId: string,
+  messageId: string
+) => {
+  const response = await axios.post<number>(
+    process.env.NEXT_PUBLIC_API_URL +
+      "/Scramble/MarkScrambleMessageRead/" +
+      scrambleTeamId +
+      "/" +
+      messageId
+  );
+  return response;
+};
+
+export const MarkAllScrambleMessageRead = async (scrambleTeamId: string) => {
+  const response = await axios.post<number>(
+    process.env.NEXT_PUBLIC_API_URL +
+      "/Scramble/MarkAllScrambleMessageRead/" +
+      scrambleTeamId
+  );
+  return response;
+};
