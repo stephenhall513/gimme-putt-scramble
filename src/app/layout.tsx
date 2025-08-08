@@ -8,6 +8,9 @@ import { StyledRoot } from "./styledRoot";
 export const metadata: Metadata = {
   title: "Gimme Putt Golf - Scrambles",
   description: "Scrambles so easy it is like a Gimme Putt",
+  icons: {
+    icon: "/images/favicon.png",
+  },
 };
 
 export default function RootLayout({
