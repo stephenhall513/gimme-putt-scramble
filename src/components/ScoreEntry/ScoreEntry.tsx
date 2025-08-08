@@ -1,4 +1,5 @@
 "use client";
+import { useRef } from "react";
 import { AddScores, GetScrambleHoleInfo } from "@/api/scoring";
 import { ScrambleScore } from "@/types/Score";
 import {
@@ -42,12 +43,13 @@ interface ScoreEntryProps {
 }
 
 const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
+  const submitActionRef = useRef<"next" | "prev" | "end" | "">("");
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showMap, setShowMap] = useState<boolean>(false);
   const [holeInfo, setHoleInfo] = useState<ScrambleScore>();
-  const [currentHoleNumber, setCurrentHoleNumber] = useState<number>(1);
-  const [nextHoleNumber, setNextHoleNumber] = useState<number>(0);
-  const [prevHoleNumber, setPrevHoleNumber] = useState<number>(0);
+  const [currentHoleNumber, setCurrentHoleNumber] = useState<number>(0);
+
   const [finishingHoleNumber, setFinishingHoleNumber] = useState<number>(0);
   const [scrambleTeam, setScrambleTeam] = useState<ScrambleTeam>();
   const [bottomPoint, setBottomPoint] = useState<Coordinates>({
@@ -82,7 +84,9 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
       console.log("ScrambleTeam", response);
       if (response.status == 200) {
         setScrambleTeam(response.data);
-        setCurrentHoleNumber(response.data.currentHole);
+        if (currentHoleNumber === 0) {
+          setCurrentHoleNumber(response.data.currentHole);
+        }
         if (response.data.holesPlayed == response.data.scramble.numOfHoles) {
           setShowEndRound(true);
         }
@@ -125,11 +129,6 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
           setTopPoint(coordinate2);
         }
 
-        if (hole) {
-          setNextHoleNumber(hole.holeNumber === 18 ? 1 : hole.holeNumber + 1);
-          setPrevHoleNumber(hole.holeNumber === 1 ? 18 : hole.holeNumber - 1);
-        }
-
         setHoleInfo(response.data);
       }
 
@@ -145,10 +144,10 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
     initialValues: {
       scrambleTeamId: scrambleTeamId,
       holeId: holeInfo?.holeId,
-      strokes: holeInfo ? holeInfo.strokes : 0,
-      submitAction: "",
+      strokes: holeInfo?.strokes || 0,
     },
     onSubmit: async (values) => {
+      const action = submitActionRef.current;
       if (values.strokes > 0) {
         const scrambleScore: ScrambleScore = {
           scrambleTeamId: holeInfo?.scrambleTeamId
@@ -159,34 +158,39 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
           strokes: values.strokes,
         };
 
-        try {
-          const response = await AddScores(scrambleScore);
-          if (response.status === 200) {
-            if (holeInfo?.strokes != values.strokes) {
-              toast.success("Score Saved");
+        // Navigate based on the submit action
+        switch (action) {
+          case "end":
+            try {
+              const response = await AddScores(scrambleScore);
+              if (response.status === 200) {
+                toast.success("Score Saved");
+              }
+            } catch (error) {
+              toast.error("There was a Problem Saving Score");
             }
-
-            // Navigate based on the submit action
-            switch (values.submitAction) {
-              case "end":
-                const endResponse = await ScrambleTeamEnd(scrambleTeamId);
-                if (endResponse.status == 200) {
-                  router.push("/scoring/" + scrambleTeamId + "/summary");
-                }
-                break;
-              case "next":
-                setCurrentHoleNumber(nextHoleNumber);
-                break;
-              case "prev":
-                setCurrentHoleNumber(prevHoleNumber);
-                break;
+            const endResponse = await ScrambleTeamEnd(scrambleTeamId);
+            if (endResponse.status == 200) {
+              router.push("/scoring/" + scrambleTeamId + "/summary");
             }
-          }
-        } catch (error) {
-          toast.error("There was a Problem Saving Score");
+            break;
+          case "next":
+            try {
+              const response = await AddScores(scrambleScore);
+              if (response.status === 200) {
+                toast.success("Score Saved");
+              }
+            } catch (error) {
+              toast.error("There was a Problem Saving Score");
+            }
+            setCurrentHoleNumber((prev) => (prev === 18 ? 1 : prev + 1));
+            break;
+          case "prev":
+            setCurrentHoleNumber((prev) => (prev === 1 ? 18 : prev - 1));
+            break;
         }
       } else {
-        switch (values.submitAction) {
+        switch (action) {
           case "end":
             toast.error("Please enter a score.");
             break;
@@ -194,7 +198,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
             toast.error("Please enter a score.");
             break;
           case "prev":
-            setCurrentHoleNumber(prevHoleNumber);
+            setCurrentHoleNumber((prev) => (prev === 1 ? 18 : prev - 1));
             break;
         }
       }
@@ -203,10 +207,15 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
 
   useEffect(() => {
     if (holeInfo) {
+      const initialStrokes =
+        holeInfo && holeInfo.strokes && holeInfo.strokes > 0
+          ? holeInfo.strokes
+          : holeInfo?.hole?.par || 4;
+
       formik.setValues((prevValues) => ({
         ...prevValues,
         holeId: holeInfo.holeId,
-        strokes: holeInfo.strokes,
+        strokes: initialStrokes,
       }));
     }
   }, [holeInfo]);
@@ -293,47 +302,55 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
               <Grid2 size={{ sm: 12 }} className="w-full">
                 <div className="flex flex-row justify-between w-full">
                   <Button
-                    type="submit"
                     variant="text"
                     color="primary"
-                    onClick={() => formik.setFieldValue("submitAction", "prev")}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      submitActionRef.current = "prev";
+                      formik.submitForm();
+                    }}
                   >
                     <ChevronLeft /> Previous
                   </Button>
-                  {showEndRound ? (
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      color="error"
-                      onClick={() =>
-                        formik.setFieldValue("submitAction", "end")
-                      }
-                    >
-                      End Round
-                    </Button>
-                  ) : (
-                    <Button
-                      type="submit"
-                      variant="text"
-                      color="primary"
-                      onClick={() =>
-                        formik.setFieldValue("submitAction", "next")
-                      }
-                    >
-                      Next <ChevronRight />
-                    </Button>
-                  )}
+                  <Button
+                    variant="text"
+                    color="primary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      submitActionRef.current = "next";
+                      formik.submitForm();
+                    }}
+                  >
+                    Next <ChevronRight />
+                  </Button>
                 </div>
               </Grid2>
-              <Grid2 className="flex flex-row justify-evenly w-full">
-                {holeInfo.gameType ? (
+              {holeInfo.gameType ? (
+                <Grid2 className="flex flex-row justify-evenly w-full">
                   <div className="font-bold text-red-700">
                     {holeInfo.gameType}
                   </div>
-                ) : (
-                  false
-                )}
-              </Grid2>
+                </Grid2>
+              ) : (
+                false
+              )}
+              {showEndRound ? (
+                <Grid2 className="flex flex-row justify-evenly w-full">
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      submitActionRef.current = "end";
+                      formik.submitForm();
+                    }}
+                  >
+                    End Round
+                  </Button>
+                </Grid2>
+              ) : (
+                false
+              )}
               <Grid2 className="flex flex-row justify-evenly w-full">
                 <div>
                   <ButtonGroup>
@@ -405,65 +422,53 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                       >
                         Enter Score for the Hole
                       </FormLabel>
-                      <RadioGroup
-                        name="strokes"
-                        onChange={formik.handleChange}
-                        style={{ flexDirection: "row" }}
-                        value={formik.values.strokes}
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        gap={2}
                       >
-                        <Box
-                          sx={{
-                            display: "grid",
-                            gridTemplateColumns: "repeat(5, 1fr)", // 5 items per row
-                            gap: 2, // Adjust spacing between items
-                            justifyContent: "center",
-                          }}
+                        <Button
+                          variant="contained"
+                          size="large"
+                          onClick={() =>
+                            formik.setFieldValue(
+                              "strokes",
+                              Math.max(1, formik.values.strokes - 1)
+                            )
+                          }
                         >
-                          {[...Array(10)].map((_, i) => (
-                            <FormControlLabel
-                              key={i + 1}
-                              value={(i + 1).toString()}
-                              control={
-                                <Radio
-                                  color="primary"
-                                  sx={{
-                                    color: "#FFFFFF",
-                                    "&.Mui-checked": {
-                                      color: "#7DB534", // color of the Radio button when selected
-                                      backgroundColor: "#7DB534", // background color when selected
-                                    },
-                                    width: 40,
-                                    height: 40,
-                                    border: 1,
-                                    borderColor: "#000000",
-                                    borderStyle: "solid",
-                                    backgroundColor: "#FFFFFF",
-                                    // "&:hover": {
-                                    //   backgroundColor: "rgba(0, 0, 0, 0.04)", // optional: hover state
-                                    // },
-                                    "&::before": {
-                                      content: `"${i + 1}"`, // Display number inside the radio
-                                      position: "absolute",
-                                      top: "50%",
-                                      left: "50%",
-                                      transform: "translate(-50%, -50%)",
-                                      color: "#000000", // Text color
-                                      fontSize: "18px", // Adjust size as needed
-                                      zIndex: 1,
-                                    },
-                                  }}
-                                />
-                              }
-                              label="" // Hide default label
-                              sx={{
-                                margin: 0,
-                                gap: "2px",
-                                alignItems: "center",
-                              }}
-                            />
-                          ))}
-                        </Box>
-                      </RadioGroup>
+                          −
+                        </Button>
+                        <input
+                          type="number"
+                          name="strokes"
+                          value={formik.values.strokes}
+                          readOnly
+                          style={{
+                            width: "60px",
+                            textAlign: "center",
+                            fontSize: "1.5rem",
+                            padding: "5px",
+                            borderRadius: "4px",
+                            border: "1px solid #ccc",
+                            backgroundColor: "#f9f9f9",
+                          }}
+                        />
+                        <Button
+                          variant="contained"
+                          size="large"
+                          onClick={() =>
+                            formik.setFieldValue(
+                              "strokes",
+                              formik.values.strokes + 1
+                            )
+                          }
+                        >
+                          +
+                        </Button>
+                      </Box>
+
                       {formik.errors.strokes && formik.touched.strokes ? (
                         <div className="text-xs text-red-600">
                           {formik.errors.strokes}
@@ -473,6 +478,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                   </Grid2>
                   {holeInfo.sponsors ? (
                     <div className="flex flex-col justify-center w-full">
+                      <div className="text-center">Hole Sponsored By:</div>
                       {holeInfo.sponsors.map((sponsor: ScrambleSponsor) => (
                         <HoleSponsor key={sponsor.id} sponsor={sponsor} />
                       ))}

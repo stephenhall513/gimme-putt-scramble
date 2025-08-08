@@ -50,27 +50,33 @@ export default function ScrambleMessageModal({
       </DialogTitle>
       <DialogContent>
         {isLoading && <CircularProgress />}
-        <List>
-          {messages?.map((msg: any) => (
-            <ListItem key={msg.messageId} alignItems="flex-start" divider>
-              <ListItemText
-                primary={msg.title}
-                secondary={
-                  <>
-                    <Typography component="span">{msg.body}</Typography>
-                    {/* <Typography
+        {messages?.length && messages?.length > 0 ? (
+          <List>
+            {messages?.map((msg: any) => (
+              <ListItem key={msg.messageId} alignItems="flex-start" divider>
+                <ListItemText
+                  primary={msg.title}
+                  secondary={
+                    <>
+                      <Typography component="span">{msg.body}</Typography>
+                      {/* <Typography
                       variant="caption"
                       color="textSecondary"
                       display="block"
                     >
                       {format(new Date(msg.createdAt), "MM/dd/yyyy hh:mm aa")}
                     </Typography> */}
-                  </>
-                }
-              />
-            </ListItem>
-          ))}
-        </List>
+                    </>
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        ) : (
+          <Typography variant="body2" color="textSecondary">
+            No Messages.
+          </Typography>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -12,7 +12,6 @@ const HoleSponsor = ({ sponsor }: HoleSponsorProps) => {
 
   return (
     <>
-      <div className="text-center">Hole Sponsored By:</div>
       <div>
         {sponsor.sponsorImage ? (
           <Link href={"https://" + sponsor.sponsorWebsite} legacyBehavior>
