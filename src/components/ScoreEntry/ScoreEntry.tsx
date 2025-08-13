@@ -106,7 +106,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
 
       if (response.status === 200) {
         const hole = response.data.hole;
-        console.log("gameType", response.data);
+
         if (hole?.coordinates && hole.coordinates.length > 0) {
           setHasCoordinates(true);
           const teeboxPoint = hole.coordinates.filter((x) => x.poi == 11)[0];
@@ -138,7 +138,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
     getScorecard();
     getTeam();
     getHoleInfo();
-  }, [currentHoleNumber, scrambleTeamId]);
+  }, [currentHoleNumber]);
 
   const formik = useFormik({
     initialValues: {
