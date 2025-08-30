@@ -58,7 +58,7 @@ const ScrambleTeamsSelect = ({
                         color="inherit"
                         underline="none"
                       >
-                        <div className="even:bg-gray-300 border-black border-[1px] p-2 rounded-md mb-4">
+                        <div className="even:bg-gray-300 bg-[#009F4D] border-black border-[1px] p-2 rounded-md mb-4">
                           <div
                             className="pt-1 text-md text-center"
                             style={{ fontFamily: "Russo One" }}
@@ -79,6 +79,12 @@ const ScrambleTeamsSelect = ({
                               scrambleTeam.scramble.scrambleDate,
                               "MM/dd/yyyy"
                             )}
+                          </div>
+                          <div
+                            className="pt-1 text-sm text-center"
+                            style={{ fontFamily: "Russo One" }}
+                          >
+                            Enter Event
                           </div>
                         </div>
                       </Link>

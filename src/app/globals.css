@@ -15,6 +15,7 @@
   --flagColor: #df564a;
   --background: #ffffff;
   --foreground: #171717;
+  --fourthColor: #009f4d;
 }
 
 @media (prefers-color-scheme: dark) {

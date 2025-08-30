@@ -73,7 +73,6 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
   useEffect(() => {
     const getScorecard = async () => {
       const response = await GetScrambleScorecard(scrambleTeamId);
-      console.log("Scorecard", response);
       if (response.status == 200) {
         setScorecard(response.data);
       }
@@ -87,7 +86,10 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
         if (currentHoleNumber === 0) {
           setCurrentHoleNumber(response.data.currentHole);
         }
-        if (response.data.holesPlayed == response.data.scramble.numOfHoles) {
+        if (
+          response.data.holesPlayed == response.data.scramble.numOfHoles - 1 ||
+          response.data.holesPlayed == 18
+        ) {
           setShowEndRound(true);
         }
         if (response.data.startingHole == 1) {
@@ -186,6 +188,14 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
             setCurrentHoleNumber((prev) => (prev === 18 ? 1 : prev + 1));
             break;
           case "prev":
+            try {
+              const response = await AddScores(scrambleScore);
+              if (response.status === 200) {
+                toast.success("Score Saved");
+              }
+            } catch (error) {
+              toast.error("There was a Problem Saving Score");
+            }
             setCurrentHoleNumber((prev) => (prev === 1 ? 18 : prev - 1));
             break;
         }
@@ -357,7 +367,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                     <Button
                       variant="contained"
                       size="small"
-                      color={showScoring ? "primary" : "secondary"}
+                      color={showScoring ? "primary" : "mcnick"}
                       onClick={() => viewScoring()}
                       style={{ fontSize: "8pt" }}
                     >
@@ -366,7 +376,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                     <Button
                       variant="contained"
                       size="small"
-                      color={showScorecard ? "primary" : "secondary"}
+                      color={showScorecard ? "primary" : "mcnick"}
                       onClick={() => viewScorecard()}
                       style={{ fontSize: "8pt" }}
                     >
@@ -376,7 +386,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                       <Button
                         variant="contained"
                         size="small"
-                        color={showMap ? "primary" : "secondary"}
+                        color={showMap ? "primary" : "mcnick"}
                         style={{ fontSize: "8pt" }}
                         onClick={() => viewMap()}
                       >
@@ -389,7 +399,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                     <Button
                       variant="contained"
                       size="small"
-                      color={showLeaderboard ? "primary" : "secondary"}
+                      color={showLeaderboard ? "primary" : "mcnick"}
                       style={{ fontSize: "8pt" }}
                       onClick={() => viewLeaderboard()}
                     >
@@ -431,6 +441,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                         <Button
                           variant="contained"
                           size="large"
+                          color="mcnick"
                           onClick={() =>
                             formik.setFieldValue(
                               "strokes",
@@ -458,6 +469,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                         <Button
                           variant="contained"
                           size="large"
+                          color="mcnick"
                           onClick={() =>
                             formik.setFieldValue(
                               "strokes",
@@ -478,7 +490,11 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
                   </Grid2>
                   {holeInfo.sponsors ? (
                     <div className="flex flex-col justify-center w-full">
-                      <div className="text-center">Hole Sponsored By:</div>
+                      {holeInfo.sponsors.length > 0 ? (
+                        <div className="text-center">Hole Sponsored By:</div>
+                      ) : (
+                        false
+                      )}
                       {holeInfo.sponsors.map((sponsor: ScrambleSponsor) => (
                         <HoleSponsor key={sponsor.id} sponsor={sponsor} />
                       ))}

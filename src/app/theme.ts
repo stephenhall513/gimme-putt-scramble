@@ -2,6 +2,22 @@ import { createTheme, ThemeOptions, ThemeProvider } from "@mui/material";
 import type {} from "@mui/x-date-pickers/themeAugmentation";
 import type {} from "@mui/x-data-grid/themeAugmentation";
 
+// 1. Extend MUI types to recognize your custom colors
+declare module "@mui/material/styles" {
+  interface Palette {
+    mcnick: Palette["primary"];
+  }
+  interface PaletteOptions {
+    mcnick?: PaletteOptions["primary"];
+  }
+}
+
+declare module "@mui/material/Button" {
+  interface ButtonPropsColorOverrides {
+    mcnick: true;
+  }
+}
+
 export const themeOptions: ThemeOptions = {
   palette: {
     mode: "light",
@@ -23,6 +39,9 @@ export const themeOptions: ThemeOptions = {
       primary: "#000000",
       secondary: "#a2a2a2",
       disabled: "#414141",
+    },
+    mcnick: {
+      main: "#009F4D",
     },
   },
   typography: {
