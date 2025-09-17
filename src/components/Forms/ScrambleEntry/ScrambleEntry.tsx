@@ -61,7 +61,7 @@ const ScrambleEntry = () => {
                     htmlFor="code"
                     className="font-bold text-black text-[14px] md:text-[16px] block mb-[10px] text-center"
                   >
-                    Enter Email Address
+                    Enter Email Address that Your Team is Registered With
                   </label>
                   <Field
                     id="email"
