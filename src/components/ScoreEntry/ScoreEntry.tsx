@@ -146,23 +146,37 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
           const hole = resp.data?.hole;
 
           if (hole?.coordinates?.length) {
-            const teeboxPoint = hole.coordinates.find((x: any) => x.poi === 11);
+            // If your API returns unknown shapes, keep `any`. Otherwise define a type (shown below).
+            const teeboxPoint = hole.coordinates.find(
+              (x: any) => x?.poi === 11
+            );
             const greenPoint = hole.coordinates.find(
-              (x: any) => x.poi === 1 && x.location === 3
+              (x: any) => x?.poi === 1 && x?.location === 3
             );
 
-            const haveBoth = Boolean(teeboxPoint && greenPoint);
-            setHasCoordinates(haveBoth);
+            if (teeboxPoint && greenPoint) {
+              setHasCoordinates(true);
 
-            if (haveBoth) {
-              setBottomPoint({
-                lat: teeboxPoint?.latitude,
-                lng: teeboxPoint?.longitude,
-              });
-              setTopPoint({
-                lat: greenPoint?.latitude,
-                lng: greenPoint?.longitude,
-              });
+              // Coerce to numbers in case API returns strings
+              const tbLat = Number(teeboxPoint.latitude);
+              const tbLng = Number(teeboxPoint.longitude);
+              const grLat = Number(greenPoint.latitude);
+              const grLng = Number(greenPoint.longitude);
+
+              // Only set if we actually have valid numbers
+              if (
+                Number.isFinite(tbLat) &&
+                Number.isFinite(tbLng) &&
+                Number.isFinite(grLat) &&
+                Number.isFinite(grLng)
+              ) {
+                setBottomPoint({ lat: tbLat, lng: tbLng });
+                setTopPoint({ lat: grLat, lng: grLng });
+              } else {
+                setHasCoordinates(false);
+              }
+            } else {
+              setHasCoordinates(false);
             }
           }
 
