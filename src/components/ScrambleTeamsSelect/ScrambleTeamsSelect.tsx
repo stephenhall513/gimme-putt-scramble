@@ -60,7 +60,7 @@ const ScrambleTeamsSelect = ({
                       >
                         <div className="even:bg-gray-300 bg-[#009F4D] border-black border-[1px] p-2 rounded-md mb-4">
                           <div
-                            className="pt-1 text-md text-center"
+                            className="pt-1 text-md text-center break-words whitespace-normal"
                             style={{ fontFamily: "Russo One" }}
                           >
                             {scrambleTeam.teamName}
