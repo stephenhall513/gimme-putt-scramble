@@ -81,6 +81,23 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
     }
   };
 
+  // Centralized save helper — returns true only on a successful 200
+  const saveScore = async (score: ScrambleScore): Promise<boolean> => {
+    try {
+      const response = await AddScores(score);
+      if (response.status === 200) {
+        toast.success("Score Saved");
+        await refreshScorecard();
+        return true;
+      }
+      toast.error("There was a Problem Saving Score");
+      return false;
+    } catch {
+      toast.error("There was a Problem Saving Score");
+      return false;
+    }
+  };
+
   // Fetch team & scorecard first
   useEffect(() => {
     let isCancelled = false;
@@ -123,10 +140,43 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
     };
   }, [scrambleTeamId]);
 
+  // Dynamic hole wrap based on scramble settings
+  const totalHoles = scrambleTeam?.scramble?.numOfHoles ?? 18;
+
+  const finishingHole = scrambleTeam
+    ? scrambleTeam.startingHole === 1
+      ? totalHoles
+      : scrambleTeam.startingHole - 1
+    : null;
+
+  const showEndRound =
+    finishingHole != null &&
+    currentHoleNumber != null &&
+    currentHoleNumber === finishingHole;
+
+  // Clamp hole number to a valid range before requesting
+  // (defensive in case anything ever sets it out of bounds)
+  const isHoleNumberValid =
+    currentHoleNumber !== null &&
+    currentHoleNumber >= 1 &&
+    currentHoleNumber <= totalHoles;
+
   // Fetch hole info when both team AND hole number are ready
   useEffect(() => {
     // IMPORTANT: check for null (not falsy), so hole 1 works fine
     if (!scrambleTeam || currentHoleNumber === null) return;
+
+    // Don't fire the request if the hole number is out of range
+    if (!isHoleNumberValid) {
+      console.error("ScoreEntry: invalid currentHoleNumber", {
+        currentHoleNumber,
+        totalHoles,
+        startingHole: scrambleTeam.startingHole,
+      });
+      setLoadError("Invalid hole number.");
+      setIsLoading(false);
+      return;
+    }
 
     let isCancelled = false;
 
@@ -146,7 +196,6 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
           const hole = resp.data?.hole;
 
           if (hole?.coordinates?.length) {
-            // If your API returns unknown shapes, keep `any`. Otherwise define a type (shown below).
             const teeboxPoint = hole.coordinates.find(
               (x: any) => x?.poi === 11
             );
@@ -155,21 +204,18 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
             );
 
             if (teeboxPoint && greenPoint) {
-              setHasCoordinates(true);
-
-              // Coerce to numbers in case API returns strings
               const tbLat = Number(teeboxPoint.latitude);
               const tbLng = Number(teeboxPoint.longitude);
               const grLat = Number(greenPoint.latitude);
               const grLng = Number(greenPoint.longitude);
 
-              // Only set if we actually have valid numbers
               if (
                 Number.isFinite(tbLat) &&
                 Number.isFinite(tbLng) &&
                 Number.isFinite(grLat) &&
                 Number.isFinite(grLng)
               ) {
+                setHasCoordinates(true);
                 setBottomPoint({ lat: tbLat, lng: tbLng });
                 setTopPoint({ lat: grLat, lng: grLng });
               } else {
@@ -182,9 +228,21 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
 
           setHoleInfo(resp.data);
         } else {
+          console.error("GetScrambleHoleInfo non-200", {
+            status: resp.status,
+            data: resp.data,
+            scrambleTeamId,
+            currentHoleNumber,
+            totalHoles,
+            startingHole: scrambleTeam.startingHole,
+          });
           setLoadError("Failed to load hole info.");
         }
-      } catch {
+      } catch (err) {
+        console.error("GetScrambleHoleInfo threw", err, {
+          scrambleTeamId,
+          currentHoleNumber,
+        });
         if (!isCancelled) {
           setLoadError("Failed to load hole info.");
         }
@@ -196,33 +254,30 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
     return () => {
       isCancelled = true;
     };
-  }, [scrambleTeam, currentHoleNumber, scrambleTeamId]);
+  }, [scrambleTeam, currentHoleNumber, scrambleTeamId, isHoleNumberValid, totalHoles]);
 
-  // Dynamic hole wrap based on scramble settings
-  // remove: const [showEndRound, setShowEndRound] = useState<boolean>(false);
-
-  const totalHoles = scrambleTeam?.scramble?.numOfHoles ?? 18;
-
-  const finishingHole = scrambleTeam
-    ? scrambleTeam.startingHole === 1
-      ? totalHoles
-      : scrambleTeam.startingHole - 1
-    : null;
-
-  const showEndRound =
-    finishingHole != null &&
-    currentHoleNumber != null &&
-    currentHoleNumber === finishingHole;
-
+  // Hole navigation — do NOT wrap past the finishing hole.
+  // Going past the finishing hole is the End Round flow.
   const goNextHole = () =>
     setCurrentHoleNumber((prev) => {
       const v = prev ?? scrambleTeam?.currentHole ?? 1;
+      if (finishingHole != null && v === finishingHole) {
+        // safety net — UI should hide Next on the finishing hole
+        return v;
+      }
       return v >= totalHoles ? 1 : v + 1;
     });
 
   const goPrevHole = () =>
     setCurrentHoleNumber((prev) => {
       const v = prev ?? scrambleTeam?.currentHole ?? 1;
+      // Don't wrap backwards past the starting hole
+      if (
+        scrambleTeam?.startingHole != null &&
+        v === scrambleTeam.startingHole
+      ) {
+        return v;
+      }
       return v <= 1 ? totalHoles : v - 1;
     });
 
@@ -244,51 +299,36 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
         };
 
         switch (action) {
-          case "end":
-            try {
-              const response = await AddScores(scrambleScore);
-              if (response.status === 200) {
-                toast.success("Score Saved");
-                await refreshScorecard();
-              }
-            } catch {
-              toast.error("There was a Problem Saving Score");
+          case "end": {
+            const saved = await saveScore(scrambleScore);
+            if (!saved) {
+              // Don't end the round if we couldn't save the final score
+              break;
             }
             try {
               const endResponse = await ScrambleTeamEnd(scrambleTeamId);
               if (endResponse.status === 200) {
                 router.push(`/scoring/${scrambleTeamId}/summary`);
+              } else {
+                toast.error("Failed to end round.");
               }
             } catch {
               toast.error("Failed to end round.");
             }
             break;
+          }
 
-          case "next":
-            try {
-              const response = await AddScores(scrambleScore);
-              if (response.status === 200) {
-                toast.success("Score Saved");
-                await refreshScorecard();
-              }
-            } catch {
-              toast.error("There was a Problem Saving Score");
-            }
-            goNextHole();
+          case "next": {
+            const saved = await saveScore(scrambleScore);
+            if (saved) goNextHole();
             break;
+          }
 
-          case "prev":
-            try {
-              const response = await AddScores(scrambleScore);
-              if (response.status === 200) {
-                toast.success("Score Saved");
-                await refreshScorecard();
-              }
-            } catch {
-              toast.error("There was a Problem Saving Score");
-            }
-            goPrevHole();
+          case "prev": {
+            const saved = await saveScore(scrambleScore);
+            if (saved) goPrevHole();
             break;
+          }
         }
       } else {
         switch (action) {
@@ -305,7 +345,6 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
   });
 
   // Keep form values synced when hole changes
-  // AFTER
   useEffect(() => {
     if (!holeInfo) return;
 
@@ -315,7 +354,6 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
         : holeInfo?.hole?.par || 4;
 
     formik.setValues((prev) => {
-      // prevent unnecessary updates that can trigger re-renders
       if (prev.holeId === holeInfo.holeId && prev.strokes === initialStrokes) {
         return prev;
       }
@@ -326,7 +364,7 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
       };
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [holeInfo]); // <-- only depends on holeInfo
+  }, [holeInfo]);
 
   // View toggles
   const viewScoring = () => {
@@ -361,9 +399,33 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
   // Render fallbacks
   if (isLoading) return <Loader />;
   if (loadError)
-    return <div className="p-4 text-red-600 text-center">{loadError}</div>;
+    return (
+      <div className="p-4 text-red-600 text-center">
+        {loadError}
+        <div className="mt-3">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              setLoadError(null);
+              // Force a refetch by nudging hole number through itself
+              setCurrentHoleNumber((prev) => (prev === null ? null : prev));
+            }}
+          >
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
   if (!holeInfo)
     return <div className="p-4 text-center">No hole data available.</div>;
+
+  // Hide Prev/Next at the boundaries of THIS team's round
+  const atStartingHole =
+    scrambleTeam?.startingHole != null &&
+    currentHoleNumber === scrambleTeam.startingHole;
+
+  const atFinishingHole = showEndRound;
 
   return (
     <div className="h-full flex flex-col">
@@ -388,28 +450,37 @@ const ScoreEntry = ({ scrambleTeamId }: ScoreEntryProps) => {
         <Grid2 container rowSpacing={2}>
           <Grid2 size={{ sm: 12 }} className="w-full">
             <div className="flex flex-row justify-between w-full">
-              <Button
-                variant="text"
-                color="primary"
-                onClick={(e) => {
-                  e.preventDefault();
-                  submitActionRef.current = "prev";
-                  formik.submitForm();
-                }}
-              >
-                <ChevronLeft /> Previous
-              </Button>
-              <Button
-                variant="text"
-                color="primary"
-                onClick={(e) => {
-                  e.preventDefault();
-                  submitActionRef.current = "next";
-                  formik.submitForm();
-                }}
-              >
-                Next <ChevronRight />
-              </Button>
+              {!atStartingHole ? (
+                <Button
+                  variant="text"
+                  color="primary"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    submitActionRef.current = "prev";
+                    formik.submitForm();
+                  }}
+                >
+                  <ChevronLeft /> Previous
+                </Button>
+              ) : (
+                <div />
+              )}
+
+              {!atFinishingHole ? (
+                <Button
+                  variant="text"
+                  color="primary"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    submitActionRef.current = "next";
+                    formik.submitForm();
+                  }}
+                >
+                  Next <ChevronRight />
+                </Button>
+              ) : (
+                <div />
+              )}
             </div>
           </Grid2>
 
